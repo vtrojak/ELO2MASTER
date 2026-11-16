@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ELO2MASTER | Tenisový ELO Systém & Štatistiky</title>
+    <style>
+        :root {
+            --bg-dark: #090e1a;
+            --bg-card: #111a2e;
+            --bg-card-alt: #17233d;
+            --bg-input: #0c1425;
+            --clay: #d95326;
+            --clay-light: #f97316;
+            --tennis-lime: #a3e635;
+            --blue-accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.16);
+            --win: #10b981;
+            --draw: #f59e0b;
+            --loss: #ef4444;
+            --radius: 14px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #172544 0%, var(--bg-dark) 65%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 84px;
+            line-height: 1.45;
+        }
+
+        /* HEADER */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            background: rgba(9, 14, 26, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+        }
+
+        .header-inner {
+            max-width: 780px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-ball {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #d9f99d, #84cc16 70%, #4d7c0f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(163, 230, 53, 0.4);
+            font-weight: 900;
+            color: #090e1a;
+            font-size: 0.85rem;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-title span {
+            color: var(--clay-light);
+            -webkit-text-fill-color: var(--clay-light);
+        }
+
+        .brand-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .header-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .param-pill {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--blue-accent);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 5px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .tv-btn {
+            background: linear-gradient(135deg, var(--clay), var(--clay-light));
+            color: white;
+            border: none;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(217, 83, 38, 0.4);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 14px 12px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--clay-light);
+            display: inline-block;
+        }
+
+        /* SUMMARY STRIP */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .stat-tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        .stat-tile-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-tile-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-top: 2px;
+            color: var(--text-main);
+        }
+
+        .stat-tile-sub {
+            font-size: 0.7rem;
+            color: var(--clay-light);
+            font-weight: 600;
+        }
+
+        /* TABLE */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 0 -6px;
+            padding: 0 6px;
+        }
+
+        table.elo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+        }
+
+        table.elo-table th {
+            text-align: left;
+            padding: 9px 6px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table.elo-table td {
+            padding: 11px 6px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            white-space: nowrap;
+        }
+
+        table.elo-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.elo-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        table.elo-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            font-weight: 800;
+            font-size: 0.76rem;
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--text-muted);
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #090e1a;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            color: #090e1a;
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #d97706, #92400e);
+            color: #ffffff;
+        }
+
+        .elo-pill {
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: var(--blue-accent);
+        }
+
+        .delta-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .delta-up { color: var(--win); }
+        .delta-down { color: var(--loss); }
+        .delta-zero { color: var(--text-muted); }
+
+        .form-dots {
+            display: inline-flex;
+            gap: 3px;
+            vertical-align: middle;
+        }
+
+        .form-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #090e1a;
+        }
+
+        .form-W { background: var(--win); color: #052e16; }
+        .form-D { background: var(--draw); color: #451a03; }
+        .form-L { background: var(--loss); color: #450a0a; }
+
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+
+        /* FORMS & INPUTS */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--clay-light);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .preset-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .preset-btn {
+            flex: 1;
+            min-width: 52px;
+            padding: 8px 6px;
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .preset-btn.active, .preset-btn:hover {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: var(--clay-light);
+            color: var(--clay-light);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px 16px;
+            border: none;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--clay), var(--clay-light));
+            color: white;
+            box-shadow: 0 4px 14px rgba(217, 83, 38, 0.35);
+        }
+
+        .btn-lime {
+            background: linear-gradient(135deg, #65a30d, #84cc16);
+            color: #090e1a;
+            box-shadow: 0 4px 14px rgba(132, 204, 22, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-alt);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* LIVE ELO PREVIEW BOX */
+        .preview-box {
+            background: linear-gradient(135deg, rgba(23, 35, 61, 0.9), rgba(12, 20, 37, 0.9));
+            border: 1px solid rgba(56, 189, 248, 0.28);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .preview-header {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--blue-accent);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .preview-vs {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .preview-player {
+            background: rgba(9, 14, 26, 0.55);
+            padding: 8px 10px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+        }
+
+        .preview-player-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .preview-prob {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .preview-new-elo {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        /* CHART */
+        .chart-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .player-chip {
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+
+        .player-chip.active {
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.35);
+            background: var(--bg-card-alt);
+        }
+
+        .chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        canvas#eloCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* MATCH ITEMS */
+        .match-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--clay-light);
+            border-radius: 10px;
+            padding: 11px 12px;
+            margin-bottom: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .match-card.draw-border {
+            border-left-color: var(--draw);
+        }
+
+        .match-meta {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .match-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .match-score-pill {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--clay-light);
+            padding: 1px 7px;
+            border-radius: 6px;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+
+        .match-gems {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .match-elo-Shift {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .match-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .icon-btn {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 8px;
+            padding: 6px 9px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .icon-btn-alt {
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* MODE BANNER */
+        .mode-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mode-box.baseline-mode {
+            background: rgba(56, 189, 248, 0.08);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        /* H2H */
+        .h2h-bar-wrap {
+            height: 12px;
+            background: var(--bg-input);
+            border-radius: 999px;
+            overflow: hidden;
+            display: flex;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+        }
+
+        .h2h-seg-a { background: var(--win); height: 100%; transition: width 0.3s; }
+        .h2h-seg-d { background: var(--draw); height: 100%; transition: width 0.3s; }
+        .h2h-seg-b { background: var(--blue-accent); height: 100%; transition: width 0.3s; }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 950;
+            background: rgba(9, 14, 26, 0.95);
+            backdrop-filter: blur(14px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+        }
+
+        .nav-item {
+            flex: 1;
+            max-width: 150px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 4px;
+            border-radius: 10px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--clay-light);
+            background: rgba(249, 115, 22, 0.1);
+            font-weight: 700;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #065f46;
+            border: 1px solid #34d399;
+            color: #ecfdf5;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* MODAL TV GRAPHIC */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 1500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            max-width: 720px;
+            width: 100%;
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        canvas#tvCanvas {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .stat-tile-value {
+                font-size: 0.96rem;
+            }
+            table.elo-table {
+                font-size: 0.78rem;
+            }
+            .grid-2-mobile-stack {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-ball">E2M</div>
+                <div>
+                    <div class="brand-title">ELO<span>2</span>MASTER</div>
+                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 5)</span>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="param-pill" id="header-params">K=30 · D=200</span>
+                <button class="tv-btn" onclick="openTvModal()" title="Vygenerovať televíznu grafiku">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    TV Grafika
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="toast" class="toast">Uložené!</div>
+
+    <main class="container">
+        <!-- SEKCIA 1: TABUĽKA -->
+        <section id="sec-table" class="section active">
+            <div class="summary-grid">
+                <div class="stat-tile">
+                    <div class="stat-tile-label">Líder rebríčka</div>
+                    <div class="stat-tile-value" id="sum-leader-name">Vlado</div>
+                    <div class="stat-tile-sub" id="sum-leader-elo">1500 ELO</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-tile-label">Hráčov v DB</div>
+                    <div class="stat-tile-value" id="sum-players-count">6</div>
+                    <div class="stat-tile-sub" id="sum-mode-badge">Prepočet od 1500 ELO</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-tile-label">Zápasy v histórii</div>
+                    <div class="stat-tile-value" id="sum-matches-count">55</div>
+                    <div class="stat-tile-sub" id="sum-total-starts">Celkovo štartov</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Priebežná tabuľka ELO (Všetci začínajú na 1500 ELO)
+                    </div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">Klikni na hráča pre detail</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="elo-table" id="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Por.</th>
+                                <th>Meno</th>
+                                <th class="text-right">ELO</th>
+                                <th class="text-right">Záp.</th>
+                                <th class="text-right">V</th>
+                                <th class="text-right">P</th>
+                                <th class="text-right">R</th>
+                                <th class="text-right">Úsp. (%)</th>
+                                <th class="text-center">Forma</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRIDAŤ NOVÉHO HRÁČA -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Pridať nového hráča do databázy
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="new-player-name">Meno tenistu</label>
+                        <input type="text" id="new-player-name" placeholder="napr. Marcel / Adam">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-player-elo">Počiatočné ELO (default 1500)</label>
+                        <input type="number" id="new-player-elo" value="1500" step="0.1">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addNewPlayer()">+ Pridať hráča do rebríčka</button>
+            </div>
+        </section>
+
+        <!-- SEKCIA 2: NOVÝ ZÁPAS -->
+        <section id="sec-match" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Zápis zápasu & Automatický prepočet ELO
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="match-date">Dátum zápasu</label>
+                    <input type="date" id="match-date">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="match-p1">Hráč A</label>
+                        <select id="match-p1" onchange="updateMatchPreview()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="match-p2">Hráč B</label>
+                        <select id="match-p2" onchange="updateMatchPreview()"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Výsledok na sety (rýchla voľba alebo vlastné číslo)</label>
+                    <div class="grid-2">
+                        <div>
+                            <label for="sets-p1" style="font-size:0.7rem;">Sety Hráč A</label>
+                            <input type="number" id="sets-p1" value="2" min="0" max="5" oninput="updateMatchPreview()">
+                        </div>
+                        <div>
+                            <label for="sets-p2" style="font-size:0.7rem;">Sety Hráč B</label>
+                            <input type="number" id="sets-p2" value="0" min="0" max="5" oninput="updateMatchPreview()">
+                        </div>
+                    </div>
+                    <div class="preset-row">
+                        <button type="button" class="preset-btn active" onclick="setQuickSets(2,0,this)">2 : 0</button>
+                        <button type="button" class="preset-btn" onclick="setQuickSets(2,1,this)">2 : 1</button>
+                        <button type="button" class="preset-btn" onclick="setQuickSets(3,0,this)">3 : 0</button>
+                        <button type="button" class="preset-btn" onclick="setQuickSets(1,1,this)">1 : 1 (Remíza)</button>
+                        <button type="button" class="preset-btn" onclick="setQuickSets(1,2,this)">1 : 2</button>
+                        <button type="button" class="preset-btn" onclick="setQuickSets(0,2,this)">0 : 2</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="match-gems">Presný stav na gemy (voliteľné, napr. 7:6 6:2)</label>
+                    <input type="text" id="match-gems" placeholder="napr. 7:6 6:2 alebo 6:7 7:6 6:3">
+                </div>
+
+                <!-- ŽIVÝ NÁHĽAD PREPOČTU PRED ULOŽENÍM -->
+                <div class="preview-box" id="live-elo-preview">
+                    <div class="preview-header">
+                        <span>Živý náhľad ELO prepočtu</span>
+                        <span id="preview-outcome-label">Výhra Hráča A (S = 1 : 0)</span>
+                    </div>
+                    <div class="preview-vs">
+                        <div class="preview-player">
+                            <div class="preview-player-name" id="prev-name-a">Hráč A</div>
+                            <div class="preview-prob" id="prev-prob-a">Očakávané E: --%</div>
+                            <div class="preview-new-elo" id="prev-elo-a">--</div>
+                        </div>
+                        <div style="font-weight:800; color:var(--text-muted); font-size:0.8rem;">VS</div>
+                        <div class="preview-player">
+                            <div class="preview-player-name" id="prev-name-b">Hráč B</div>
+                            <div class="preview-prob" id="prev-prob-b">Očakávané E: --%</div>
+                            <div class="preview-new-elo" id="prev-elo-b">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveMatch()">Zapísať výsledok a aktualizovať ELO</button>
+            </div>
+        </section>
+
+        <!-- SEKCIA 3: GRAF VÝVOJA ELO -->
+        <section id="sec-chart" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Vývoj ELO hodnotenia v čase (<span id="chart-steps-count">0</span> krokov)
+                    </div>
+                    <button class="preset-btn" style="flex:0; padding:4px 10px; font-size:0.72rem;" onclick="toggleAllChartPlayers()">Všetci / Aktívni</button>
+                </div>
+
+                <div class="chart-controls" id="chart-player-chips"></div>
+
+                <div class="canvas-wrap">
+                    <canvas id="eloCanvas"></canvas>
+                </div>
+                <div id="chart-point-info" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                    Klepnite alebo prejdite prstom po grafe pre zobrazenie detailu zápasu a ELO bodov.
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCIA 4: ŠTATISTIKY & VZÁJOMNÉ SÚBOJE (H2H) -->
+        <section id="sec-h2h" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Vzájomné súboje (Head-to-Head) & Predikcia
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-bottom: 12px;">
+                    <div>
+                        <label for="h2h-p1">Tenista 1</label>
+                        <select id="h2h-p1" onchange="renderH2H()"></select>
+                    </div>
+                    <div>
+                        <label for="h2h-p2">Tenista 2</label>
+                        <select id="h2h-p2" onchange="renderH2H()"></select>
+                    </div>
+                </div>
+                <div id="h2h-content"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Detailná karta hráča
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-select">Vyber hráča</label>
+                    <select id="profile-select" onchange="renderPlayerProfile()"></select>
+                </div>
+                <div id="profile-content"></div>
+            </div>
+        </section>
+
+        <!-- SEKCIA 5: HISTÓRIA ZÁPASOV, DODATOČNÝ ZÁPIS & PREPOČET OD 1500 -->
+        <section id="sec-history" class="section">
+
+            <!-- KARTA 1: INFO O REŽIME -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
+                        Aktívny režim histórie (Verzia 5)
+                    </div>
+                    <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
+                </div>
+
+                <div class="mode-box">
+                    <div style="font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; color: var(--tennis-lime);">Nová kompletná história 55 zápasov</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Všetci hráči začínajú na štarte s hodnotou 1500.0 ELO a tabuľka sa rátala chronologicky cez všetkých 55 zápasov od prvého po posledný.</div>
+                </div>
+            </div>
+
+            <!-- KARTA 2: DODATOČNE PRIDAŤ HISTORICKÝ ZÁPAS -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Dodatočne vložiť zápas do histórie
+                    </div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">Automatické chronologické zaradenie</span>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hist-date">Dátum zápasu</label>
+                        <input type="date" id="hist-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="hist-gems">Gemy (voliteľné)</label>
+                        <input type="text" id="hist-gems" placeholder="napr. 6:4 6:3">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="hist-p1">Hráč A</label>
+                        <select id="hist-p1"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hist-p2">Hráč B</label>
+                        <select id="hist-p2"></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Výsledok na sety</label>
+                    <div class="grid-2">
+                        <div>
+                            <label for="hist-sets1" style="font-size:0.7rem;">Sety Hráč A</label>
+                            <input type="number" id="hist-sets1" value="2" min="0" max="5">
+                        </div>
+                        <div>
+                            <label for="hist-sets2" style="font-size:0.7rem;">Sety Hráč B</label>
+                            <input type="number" id="hist-sets2" value="0" min="0" max="5">
+                        </div>
+                    </div>
+                    <div class="preset-row" id="hist-preset-row">
+                        <button type="button" class="preset-btn active" onclick="setHistQuickSets(2,0,this)">2 : 0</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(2,1,this)">2 : 1</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(3,0,this)">3 : 0</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,0,this)">1 : 0</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,1,this)">1 : 1</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,2,this)">1 : 2</button>
+                        <button type="button" class="preset-btn" onclick="setHistQuickSets(0,2,this)">0 : 2</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addRetroactiveMatch()">+ Vložiť zápas do histórie a prepočítať</button>
+            </div>
+
+            <!-- KARTA 3: ZOZNAM ZÁPASOV V HISTÓRII -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Chronologický zoznam zápasov (<span id="history-count-label">0</span>)
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <select id="history-sort-order" onchange="renderMatchHistory()" style="width: auto; padding: 5px 10px; font-size: 0.76rem;">
+                            <option value="desc">Od najnovšieho</option>
+                            <option value="asc">Od najstaršieho (#1)</option>
+                        </select>
+                        <select id="history-filter-player" onchange="renderMatchHistory()" style="width: auto; padding: 5px 10px; font-size: 0.76rem;">
+                            <option value="all">Všetci hráči</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="history-list"></div>
+            </div>
+
+            <!-- KARTA 4: PARAMETRE & ZÁLOHA -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-dot"></span>
+                        Parametre K / D a zálohovanie
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label for="cfg-k">Koeficient K (default 30)</label>
+                        <input type="number" id="cfg-k" value="30" step="1" onchange="updateParams()">
+                    </div>
+                    <div class="form-group">
+                        <label for="cfg-d">Faktor D (default 200)</label>
+                        <input type="number" id="cfg-d" value="200" step="10" onchange="updateParams()">
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary" onclick="exportBackupJSON()">Stiahnuť JSON zálohu</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-json-input').click()">Načítať JSON zálohu</button>
+                    <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importBackupJSON(event)">
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary" onclick="exportTableCSV()">Export tabuľky (CSV)</button>
+                    <button class="btn btn-secondary" onclick="freezeCurrentAsBaseline()">Zafixovať ELO ako čistý štart</button>
+                </div>
+
+                <button class="btn btn-danger" onclick="resetToThreadDefault()">Obnoviť pôvodné dáta z vlákna (Reset)</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL PRE TV GRAFIKU -->
+    <div class="modal-backdrop" id="tv-modal" onclick="if(event.target===this) closeTvModal()">
+        <div class="modal-box">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-title-dot"></span>
+                    Televízna infografika (Antukový kurt · Bez tvárí)
+                </div>
+                <button class="icon-btn" onclick="closeTvModal()">Zavrieť ✕</button>
+            </div>
+            <canvas id="tvCanvas" width="1600" height="900"></canvas>
+            <div class="grid-2">
+                <button class="btn btn-primary" onclick="downloadTvGraphic()">Stiahnuť PNG grafiku (HD)</button>
+                <button class="btn btn-secondary" onclick="closeTvModal()">Späť do aplikácie</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPODNÁ NAVIGÁCIA PRE MOBIL -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('sec-table', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            Tabuľka
+        </button>
+        <button class="nav-item" onclick="switchTab('sec-match', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Nový zápas
+        </button>
+        <button class="nav-item" onclick="switchTab('sec-chart', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Graf ELO
+        </button>
+        <button class="nav-item" onclick="switchTab('sec-h2h', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            H2H & Hráči
+        </button>
+        <button class="nav-item" onclick="switchTab('sec-history', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            História
+        </button>
+    </nav>
+
+    <script>
+        const STORAGE_KEY = "ELO2MASTER_DB_V5";
+
+        const PLAYER_COLORS = [
+            "#f97316", // Vlado
+            "#38bdf8", // Toňo
+            "#a3e635", // Peťo
+            "#c084fc", // Tibor
+            "#facc15", // Belo
+            "#f43f5e", // Majo
+            "#2dd4bf", // Extra 1
+            "#fb7185", // Extra 2
+            "#60a5fa", // Extra 3
+            "#e879f9"  // Extra 4
+        ];
+
+        const INITIAL_PLAYERS = [
+            { id: "vlado", name: "Vlado", color: "#f97316" },
+            { id: "tono",  name: "Toňo",  color: "#38bdf8" },
+            { id: "peto",  name: "Peťo",  color: "#a3e635" },
+            { id: "tibor", name: "Tibor", color: "#c084fc" },
+            { id: "belo",  name: "Belo",  color: "#facc15" },
+            { id: "majo",  name: "Majo",  color: "#f43f5e" }
+        ];
+
+        // 55 completed matches ordered chronologically with generated dates from 2024-07-18 to 2026-06-15
+        const INITIAL_MATCHES = [
+            { id: "m55_1", date: "2024-07-18", p1: "majo", p2: "tibor", sets1: 1, sets2: 1, gems: "6:1 3:6" },
+            { id: "m55_2", date: "2024-08-04", p1: "majo", p2: "belo", sets1: 0, sets2: 2, gems: "4:6 4:6" },
+            { id: "m55_3", date: "2024-09-07", p1: "belo", p2: "peto", sets1: 2, sets2: 0, gems: "6:3 6:3" },
+            { id: "m55_4", date: "2024-09-12", p1: "belo", p2: "tono", sets1: 1, sets2: 2, gems: "0:6 6:2 4:6" },
+            { id: "m55_5", date: "2024-09-15", p1: "belo", p2: "tibor", sets1: 3, sets2: 0, gems: "6:3 6:2 6:2" },
+            { id: "m55_6", date: "2024-09-20", p1: "belo", p2: "majo", sets1: 1, sets2: 1, gems: "3:6 6:2" },
+            { id: "m55_7", date: "2024-09-27", p1: "tono", p2: "belo", sets1: 3, sets2: 0, gems: "6:3 6:3 6:2" },
+            { id: "m55_8", date: "2024-10-02", p1: "belo", p2: "majo", sets1: 2, sets2: 0, gems: "6:3 6:1" },
+            { id: "m55_9", date: "2024-10-05", p1: "belo", p2: "tono", sets1: 2, sets2: 0, gems: "7:5 7:5" },
+            { id: "m55_10", date: "2024-10-09", p1: "majo", p2: "tono", sets1: 0, sets2: 2, gems: "2:6 2:6" },
+            { id: "m55_11", date: "2024-10-15", p1: "majo", p2: "peto", sets1: 0, sets2: 2, gems: "1:6 1:6" },
+            { id: "m55_12", date: "2024-10-22", p1: "belo", p2: "tono", sets1: 0, sets2: 2, gems: "4:6 2:6" },
+            { id: "m55_13", date: "2024-11-03", p1: "tono", p2: "peto", sets1: 2, sets2: 1, gems: "3:6 7:5 6:0" },
+            { id: "m55_14", date: "2024-11-13", p1: "belo", p2: "majo", sets1: 1, sets2: 1, gems: "3:6 6:3" },
+            { id: "m55_15", date: "2024-11-20", p1: "belo", p2: "majo", sets1: 2, sets2: 0, gems: "6:0 6:0" },
+            { id: "m55_16", date: "2024-11-30", p1: "belo", p2: "tibor", sets1: 1, sets2: 2, gems: "5:7 6:3 2:6" },
+            { id: "m55_17", date: "2024-12-05", p1: "belo", p2: "tibor", sets1: 2, sets2: 1, gems: "6:3 7:5 5:7" },
+            { id: "m55_18", date: "2024-12-12", p1: "belo", p2: "tono", sets1: 2, sets2: 1, gems: "6:2 6:3 2:6" },
+            { id: "m55_19", date: "2024-12-18", p1: "belo", p2: "tono", sets1: 0, sets2: 3, gems: "3:6 5:7 3:6" },
+            { id: "m55_20", date: "2025-01-08", p1: "belo", p2: "vlado", sets1: 0, sets2: 2, gems: "1:6 2:6" },
+            { id: "m55_21", date: "2025-01-18", p1: "belo", p2: "tono", sets1: 1, sets2: 1, gems: "6:7 6:1" },
+            { id: "m55_22", date: "2025-01-25", p1: "belo", p2: "tibor", sets1: 3, sets2: 0, gems: "6:3 6:0 7:6" },
+            { id: "m55_23", date: "2025-02-01", p1: "belo", p2: "tono", sets1: 0, sets2: 3, gems: "2:6 5:7 3:6" },
+            { id: "m55_24", date: "2025-02-10", p1: "belo", p2: "tibor", sets1: 1, sets2: 2, gems: "7:5 3:6 6:7" },
+            { id: "m55_25", date: "2025-02-20", p1: "belo", p2: "tono", sets1: 1, sets2: 1, gems: "6:2 4:6" },
+            { id: "m55_26", date: "2025-02-27", p1: "tono", p2: "tibor", sets1: 2, sets2: 1, gems: "3:6 7:6 6:4" },
+            { id: "m55_27", date: "2025-03-06", p1: "belo", p2: "tono", sets1: 1, sets2: 1, gems: "6:4 4:6" },
+            { id: "m55_28", date: "2025-03-12", p1: "vlado", p2: "tono", sets1: 2, sets2: 0, gems: "7:6 7:6" },
+            { id: "m55_29", date: "2025-03-20", p1: "belo", p2: "tono", sets1: 2, sets2: 1, gems: "6:4 6:3 1:6" },
+            { id: "m55_30", date: "2025-03-28", p1: "tono", p2: "belo", sets1: 2, sets2: 1, gems: "2:6 6:3 6:4" },
+            { id: "m55_31", date: "2025-04-06", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:4 6:4" },
+            { id: "m55_32", date: "2025-04-14", p1: "belo", p2: "tibor", sets1: 2, sets2: 0, gems: "6:3 6:3" },
+            { id: "m55_33", date: "2025-04-22", p1: "belo", p2: "tibor", sets1: 2, sets2: 1, gems: "6:2 6:7 6:2" },
+            { id: "m55_34", date: "2025-05-02", p1: "vlado", p2: "belo", sets1: 3, sets2: 0, gems: "6:0 6:4 7:5" },
+            { id: "m55_35", date: "2025-05-10", p1: "tono", p2: "tibor", sets1: 3, sets2: 0, gems: "6:3 6:0 7:5" },
+            { id: "m55_36", date: "2025-05-18", p1: "vlado", p2: "tibor", sets1: 2, sets2: 1, gems: "6:4 2:6 6:3" },
+            { id: "m55_37", date: "2025-05-25", p1: "tono", p2: "belo", sets1: 1, sets2: 1, gems: "6:2 6:7" },
+            { id: "m55_38", date: "2025-06-02", p1: "vlado", p2: "belo", sets1: 3, sets2: 0, gems: "6:3 6:1 6:4" },
+            { id: "m55_39", date: "2025-06-12", p1: "vlado", p2: "belo", sets1: 3, sets2: 0, gems: "6:2 7:6 6:3" },
+            { id: "m55_40", date: "2025-06-20", p1: "tibor", p2: "belo", sets1: 2, sets2: 1, gems: "4:6 6:4 6:3" },
+            { id: "m55_41", date: "2025-06-28", p1: "vlado", p2: "tibor", sets1: 2, sets2: 0, gems: "6:3 6:3" },
+            { id: "m55_42", date: "2025-07-06", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:3 6:2" },
+            { id: "m55_43", date: "2025-07-15", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:4 6:2" },
+            { id: "m55_44", date: "2025-07-22", p1: "vlado", p2: "tono", sets1: 2, sets2: 0, gems: "7:6 6:4" },
+            { id: "m55_45", date: "2025-07-30", p1: "belo", p2: "tono", sets1: 2, sets2: 0, gems: "6:2 6:4" },
+            { id: "m55_46", date: "2025-08-08", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:3 6:2" },
+            { id: "m55_47", date: "2025-08-16", p1: "tibor", p2: "belo", sets1: 2, sets2: 1, gems: "7:6 2:6 7:5" },
+            { id: "m55_48", date: "2025-08-25", p1: "vlado", p2: "tibor", sets1: 2, sets2: 0, gems: "6:3 7:6" },
+            { id: "m55_49", date: "2025-09-04", p1: "vlado", p2: "belo", sets1: 2, sets2: 1, gems: "6:4 6:3 3:6" },
+            { id: "m55_50", date: "2025-09-12", p1: "belo", p2: "tibor", sets1: 2, sets2: 0, gems: "7:6 6:3" },
+            { id: "m55_51", date: "2026-06-14", p1: "vlado", p2: "tibor", sets1: 2, sets2: 0, gems: "6:4 6:2" },
+            { id: "m55_52", date: "2026-06-14", p1: "belo", p2: "vlado", sets1: 1, sets2: 1, gems: "4:6 7:6" },
+            { id: "m55_53", date: "2026-06-14", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:3 6:3" },
+            { id: "m55_54", date: "2026-06-14", p1: "tibor", p2: "belo", sets1: 2, sets2: 1, gems: "6:7 7:6 6:3" },
+            { id: "m55_55", date: "2026-06-15", p1: "vlado", p2: "tibor", sets1: 3, sets2: 0, gems: "6:2 6:4 6:4" }
+        ];
+
+        let state = {
+            config: { K: 30, D: 200, calcFrom1500: true },
+            players: [],
+            matches: [],
+            chartVisiblePlayers: {}
+        };
+
+        let computedPlayers = [];
+        let computedMatches = [];
+        let timelinePoints = []; 
+        let interactiveHitPoints = [];
+
+        function initApp() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    state.config = { K: 30, D: 200, calcFrom1500: true, ...(parsed.config || {}) };
+                    state.players = parsed.players || JSON.parse(JSON.stringify(INITIAL_PLAYERS));
+                    state.matches = parsed.matches || JSON.parse(JSON.stringify(INITIAL_MATCHES));
+                    state.chartVisiblePlayers = parsed.chartVisiblePlayers || {};
+                } catch (e) {
+                    loadDefaults();
+                }
+            } else {
+                loadDefaults();
+            }
+
+            // Ensure all INITIAL_PLAYERS are present
+            INITIAL_PLAYERS.forEach(ip => {
+                if (!state.players.some(p => p.id === ip.id)) {
+                    state.players.push(JSON.parse(JSON.stringify(ip)));
+                }
+            });
+
+            state.players.forEach((p, idx) => {
+                if (!p.color) p.color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
+                if (typeof state.chartVisiblePlayers[p.id] === "undefined") {
+                    state.chartVisiblePlayers[p.id] = true;
+                }
+            });
+
+            const todayIso = new Date().toISOString().split("T")[0];
+            document.getElementById("match-date").value = todayIso;
+            document.getElementById("hist-date").value = "2025-05-01";
+            document.getElementById("cfg-k").value = state.config.K;
+            document.getElementById("cfg-d").value = state.config.D;
+
+            sortMatchesChronologically();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            setupCanvasEvents();
+        }
+
+        function loadDefaults() {
+            state.config = { K: 30, D: 200, calcFrom1500: true };
+            state.players = JSON.parse(JSON.stringify(INITIAL_PLAYERS));
+            state.matches = JSON.parse(JSON.stringify(INITIAL_MATCHES));
+            state.chartVisiblePlayers = {};
+            state.players.forEach((p, idx) => {
+                p.color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
+                state.chartVisiblePlayers[p.id] = true;
+            });
+            saveState();
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function sortMatchesChronologically() {
+            state.matches = state.matches
+                .map((item, idx) => ({ item, idx }))
+                .sort((a, b) => {
+                    const dA = a.item.date || "1970-01-01";
+                    const dB = b.item.date || "1970-01-01";
+                    if (dA < dB) return -1;
+                    if (dA > dB) return 1;
+                    return a.idx - b.idx;
+                })
+                .map(x => x.item);
+        }
+
+        function parseGemsString(gemsStr) {
+            let g1 = 0, g2 = 0;
+            if (!gemsStr || !gemsStr.trim()) return { g1: 0, g2: 0 };
+            const parts = gemsStr.trim().split(/\s+/);
+            parts.forEach(part => {
+                const m = part.match(/^(\d+)[:\-](\d+)/);
+                if (m) {
+                    g1 += parseInt(m[1], 10);
+                    g2 += parseInt(m[2], 10);
+                }
+            });
+            return { g1, g2 };
+        }
+
+        function recalculateAll() {
+            const K = Number(state.config.K) || 30;
+            const D = Number(state.config.D) || 200;
+
+            document.getElementById("header-params").textContent = `K=${K} · D=${D}`;
+
+            const pMap = {};
+            state.players.forEach((p, idx) => {
+                const startElo = 1500.0;
+                pMap[p.id] = {
+                    ...p,
+                    color: p.color || PLAYER_COLORS[idx % PLAYER_COLORS.length],
+                    elo: startElo,
+                    effectiveStartElo: startElo,
+                    minElo: startElo,
+                    maxElo: startElo,
+                    lastDelta: 0,
+                    matches: 0,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    setsWon: 0,
+                    setsLost: 0,
+                    gemsWon: 0,
+                    gemsLost: 0,
+                    form: []
+                };
+            });
+
+            timelinePoints = [{
+                step: 0,
+                label: "Štart",
+                title: "Počiatočný stav (všetci 1500.0 ELO)",
+                elos: {}
+            }];
+            Object.values(pMap).forEach(p => {
+                timelinePoints[0].elos[p.id] = p.elo;
+            });
+
+            computedMatches = [];
+
+            state.matches.forEach((m, idx) => {
+                const pA = pMap[m.p1];
+                const pB = pMap[m.p2];
+                if (!pA || !pB) return;
+
+                const rA = pA.elo;
+                const rB = pB.elo;
+
+                const eA = 1 / (1 + Math.pow(10, (rB - rA) / D));
+                const eB = 1 - eA;
+
+                let sA = 0.5, sB = 0.5;
+                if (Number(m.sets1) > Number(m.sets2)) {
+                    sA = 1; sB = 0;
+                    pA.wins++; pB.losses++;
+                    pA.form.push("W"); pB.form.push("L");
+                } else if (Number(m.sets2) > Number(m.sets1)) {
+                    sA = 0; sB = 1;
+                    pA.losses++; pB.wins++;
+                    pA.form.push("L"); pB.form.push("W");
+                } else {
+                    pA.draws++; pB.draws++;
+                    pA.form.push("D"); pB.form.push("D");
+                }
+
+                pA.matches++;
+                pB.matches++;
+                pA.setsWon += Number(m.sets1) || 0;
+                pA.setsLost += Number(m.sets2) || 0;
+                pB.setsWon += Number(m.sets2) || 0;
+                pB.setsLost += Number(m.sets1) || 0;
+
+                const parsedGems = parseGemsString(m.gems);
+                pA.gemsWon += parsedGems.g1;
+                pA.gemsLost += parsedGems.g2;
+                pB.gemsWon += parsedGems.g2;
+                pB.gemsLost += parsedGems.g1;
+
+                const rawDeltaA = K * (sA - eA);
+                const newEloA = Math.round((rA + rawDeltaA) * 10) / 10;
+                const newEloB = Math.round((rB - rawDeltaA) * 10) / 10;
+
+                const appliedDeltaA = Math.round((newEloA - rA) * 10) / 10;
+                const appliedDeltaB = Math.round((newEloB - rB) * 10) / 10;
+
+                pA.elo = newEloA;
+                pB.elo = newEloB;
+                
+                pA.lastDelta = appliedDeltaA;
+                pB.lastDelta = appliedDeltaB;
+
+                if (pA.elo > pA.maxElo) pA.maxElo = pA.elo;
+                if (pA.elo < pA.minElo) pA.minElo = pA.elo;
+                if (pB.elo > pB.maxElo) pB.maxElo = pB.elo;
+                if (pB.elo < pB.minElo) pB.minElo = pB.elo;
+
+                const enriched = {
+                    ...m,
+                    effectiveIgnoreElo: false,
+                    index: idx + 1,
+                    nameA: pA.name,
+                    nameB: pB.name,
+                    eloBeforeA: rA,
+                    eloBeforeB: rB,
+                    eloAfterA: newEloA,
+                    eloAfterB: newEloB,
+                    deltaA: appliedDeltaA,
+                    deltaB: appliedDeltaB,
+                    probA: eA,
+                    probB: eB
+                };
+                computedMatches.push(enriched);
+
+                const snap = {
+                    step: timelinePoints.length,
+                    label: `#${timelinePoints.length}`,
+                    title: `#${timelinePoints.length} (${m.date}): ${pA.name} vs ${pB.name} ${m.sets1}:${m.sets2} ${m.gems ? '(' + m.gems + ')' : ''}`,
+                    match: enriched,
+                    elos: {}
+                };
+                Object.values(pMap).forEach(pl => {
+                    snap.elos[pl.id] = pl.elo;
+                });
+                timelinePoints.push(snap);
+            });
+
+            computedPlayers = Object.values(pMap).sort((a, b) => b.elo - a.elo);
+        }
+
+        function populateSelects() {
+            const ids = ["match-p1", "match-p2", "hist-p1", "hist-p2", "h2h-p1", "h2h-p2", "profile-select"];
+            const prevValues = {};
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) prevValues[id] = el.value;
+            });
+
+            const sortedByElo = [...computedPlayers];
+            const optionsHtml = sortedByElo.map(p => `<option value="${p.id}">${p.name} (${p.elo.toFixed(1)})</option>`).join("");
+
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = optionsHtml;
+                if (prevValues[id] && sortedByElo.some(p => p.id === prevValues[id])) {
+                    el.value = prevValues[id];
+                }
+            });
+
+            if (sortedByElo.length >= 2) {
+                const m1 = document.getElementById("match-p1");
+                const m2 = document.getElementById("match-p2");
+                if (m1.value === m2.value) {
+                    m1.value = sortedByElo[0].id;
+                    m2.value = sortedByElo[3] ? sortedByElo[3].id : sortedByElo[1].id;
+                }
+                const hp1 = document.getElementById("hist-p1");
+                const hp2 = document.getElementById("hist-p2");
+                if (hp1 && hp2 && hp1.value === hp2.value) {
+                    hp1.value = sortedByElo[0].id;
+                    hp2.value = sortedByElo[1].id;
+                }
+                const h1 = document.getElementById("h2h-p1");
+                const h2 = document.getElementById("h2h-p2");
+                if (h1.value === h2.value) {
+                    h1.value = sortedByElo[0].id;
+                    h2.value = sortedByElo[4] ? sortedByElo[4].id : sortedByElo[1].id;
+                }
+            }
+
+            const histFilter = document.getElementById("history-filter-player");
+            const prevHist = histFilter.value || "all";
+            histFilter.innerHTML = `<option value="all">Všetci hráči (${computedMatches.length})</option>` +
+                sortedByElo.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+            if ([...histFilter.options].some(o => o.value === prevHist)) {
+                histFilter.value = prevHist;
+            }
+        }
+
+        function refreshAllViews() {
+            renderLeaderboard();
+            updateMatchPreview();
+            renderChartChips();
+            drawEloChart();
+            renderH2H();
+            renderPlayerProfile();
+            renderMatchHistory();
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.querySelector("#leaderboard-table tbody");
+            tbody.innerHTML = "";
+
+            if (computedPlayers.length > 0) {
+                document.getElementById("sum-leader-name").textContent = computedPlayers[0].name;
+                document.getElementById("sum-leader-elo").textContent = `${computedPlayers[0].elo.toFixed(1)} ELO`;
+            }
+            document.getElementById("sum-players-count").textContent = computedPlayers.length;
+            document.getElementById("sum-matches-count").textContent = computedMatches.length;
+
+            const totalStarts = computedPlayers.reduce((acc, p) => acc + p.matches, 0);
+            document.getElementById("sum-total-starts").textContent = `Spolu ${totalStarts} štartov`;
+
+            computedPlayers.forEach((p, idx) => {
+                const rank = idx + 1;
+                const winPct = p.matches > 0
+                    ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1)
+                    : "0.0";
+
+                let rankClass = "";
+                if (rank === 1) rankClass = "rank-1";
+                else if (rank === 2) rankClass = "rank-2";
+                else if (rank === 3) rankClass = "rank-3";
+
+                let deltaHtml = "";
+                if (p.lastDelta > 0) {
+                    deltaHtml = `<span class="delta-tag delta-up">▲+${p.lastDelta.toFixed(1)}</span>`;
+                } else if (p.lastDelta < 0) {
+                    deltaHtml = `<span class="delta-tag delta-down">▼${p.lastDelta.toFixed(1)}</span>`;
+                }
+
+                const last5 = p.form.slice(-5);
+                const formHtml = last5.length > 0
+                    ? `<div class="form-dots">` + last5.map(f => `<span class="form-dot form-${f}">${f === 'W' ? 'V' : (f === 'D' ? 'R' : 'P')}</span>`).join("") + `</div>`
+                    : `<span style="color:var(--text-muted); font-size:0.72rem;">—</span>`;
+
+                const tr = document.createElement("tr");
+                tr.onclick = () => openPlayerDetail(p.id);
+                tr.innerHTML = `
+                    <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:7px;">
+                            <span style="width:8px; height:8px; border-radius:50%; background:${p.color}; display:inline-block;"></span>
+                            <strong>${p.name}</strong>
+                        </div>
+                    </td>
+                    <td class="text-right"><span class="elo-pill">${p.elo.toFixed(1)}</span>${deltaHtml}</td>
+                    <td class="text-right">${p.matches}</td>
+                    <td class="text-right" style="color:var(--win); font-weight:700;">${p.wins}</td>
+                    <td class="text-right" style="color:var(--loss);">${p.losses}</td>
+                    <td class="text-right" style="color:var(--draw);">${p.draws}</td>
+                    <td class="text-right" style="font-weight:700;">${winPct}%</td>
+                    <td class="text-center">${formHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openPlayerDetail(playerId) {
+            document.getElementById("profile-select").value = playerId;
+            renderPlayerProfile();
+            const navBtn = document.querySelectorAll(".bottom-nav .nav-item")[3];
+            switchTab("sec-h2h", navBtn);
+        }
+
+        function addNewPlayer() {
+            const nameInput = document.getElementById("new-player-name");
+            const eloInput = document.getElementById("new-player-elo");
+            const name = nameInput.value.trim();
+            const baseElo = parseFloat(eloInput.value);
+
+            if (!name) {
+                showToast("Zadaj meno hráča!", true);
+                return;
+            }
+
+            const cleanId = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "") || ("hrac" + Date.now());
+            if (state.players.some(p => p.id === cleanId || p.name.toLowerCase() === name.toLowerCase())) {
+                showToast("Hráč s týmto menom už v databáze existuje!", true);
+                return;
+            }
+
+            const startElo = isNaN(baseElo) ? 1500 : Math.round(baseElo * 10) / 10;
+            const color = PLAYER_COLORS[state.players.length % PLAYER_COLORS.length];
+
+            state.players.push({
+                id: cleanId,
+                name: name,
+                color: color
+            });
+            state.chartVisiblePlayers[cleanId] = true;
+
+            nameInput.value = "";
+            eloInput.value = "1500";
+
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            showToast(`Hráč ${name} bol pridaný do systému s počiatočným ELO 1500!`);
+        }
+
+        function setQuickSets(s1, s2, btnEl) {
+            document.getElementById("sets-p1").value = s1;
+            document.getElementById("sets-p2").value = s2;
+            document.querySelectorAll("#sec-match .preset-btn").forEach(b => b.classList.remove("active"));
+            if (btnEl) btnEl.classList.add("active");
+            updateMatchPreview();
+        }
+
+        function setHistQuickSets(s1, s2, btnEl) {
+            document.getElementById("hist-sets1").value = s1;
+            document.getElementById("hist-sets2").value = s2;
+            document.querySelectorAll("#hist-preset-row .preset-btn").forEach(b => b.classList.remove("active"));
+            if (btnEl) btnEl.classList.add("active");
+        }
+
+        function updateMatchPreview() {
+            const id1 = document.getElementById("match-p1").value;
+            const id2 = document.getElementById("match-p2").value;
+            const s1 = parseInt(document.getElementById("sets-p1").value, 10) || 0;
+            const s2 = parseInt(document.getElementById("sets-p2").value, 10) || 0;
+
+            const p1 = computedPlayers.find(p => p.id === id1);
+            const p2 = computedPlayers.find(p => p.id === id2);
+            if (!p1 || !p2) return;
+
+            const K = Number(state.config.K) || 30;
+            const D = Number(state.config.D) || 200;
+
+            const e1 = 1 / (1 + Math.pow(10, (p2.elo - p1.elo) / D));
+            const e2 = 1 - e1;
+
+            let score1 = 0.5, score2 = 0.5;
+            let outcomeText = "Remíza (S = 0.5 : 0.5)";
+            if (s1 > s2) {
+                score1 = 1; score2 = 0;
+                outcomeText = `Víťaz: ${p1.name} (S = 1 : 0)`;
+            } else if (s2 > s1) {
+                score1 = 0; score2 = 1;
+                outcomeText = `Víťaz: ${p2.name} (S = 0 : 1)`;
+            }
+
+            const delta1 = K * (score1 - e1);
+            const new1 = Math.round((p1.elo + delta1) * 10) / 10;
+            const new2 = Math.round((p2.elo - delta1) * 10) / 10;
+            const diff1 = Math.round((new1 - p1.elo) * 10) / 10;
+            const diff2 = Math.round((new2 - p2.elo) * 10) / 10;
+
+            document.getElementById("preview-outcome-label").textContent = id1 === id2 ? "Vyber 2 rôznych hráčov!" : outcomeText;
+            document.getElementById("prev-name-a").textContent = `${p1.name} (${p1.elo.toFixed(1)})`;
+            document.getElementById("prev-name-b").textContent = `${p2.name} (${p2.elo.toFixed(1)})`;
+            document.getElementById("prev-prob-a").textContent = `Očakávané E: ${(e1 * 100).toFixed(1)}%`;
+            document.getElementById("prev-prob-b").textContent = `Očakávané E: ${(e2 * 100).toFixed(1)}%`;
+
+            const sign1 = diff1 >= 0 ? `+${diff1.toFixed(1)}` : diff1.toFixed(1);
+            const sign2 = diff2 >= 0 ? `+${diff2.toFixed(1)}` : diff2.toFixed(1);
+
+            document.getElementById("prev-elo-a").innerHTML = `${new1.toFixed(1)} <span style="font-size:0.78rem; color:${diff1 >= 0 ? 'var(--win)' : 'var(--loss)'}">(${sign1})</span>`;
+            document.getElementById("prev-elo-b").innerHTML = `${new2.toFixed(1)} <span style="font-size:0.78rem; color:${diff2 >= 0 ? 'var(--win)' : 'var(--loss)'}">(${sign2})</span>`;
+        }
+
+        function saveMatch() {
+            const date = document.getElementById("match-date").value || new Date().toISOString().split("T")[0];
+            const p1 = document.getElementById("match-p1").value;
+            const p2 = document.getElementById("match-p2").value;
+            const sets1 = parseInt(document.getElementById("sets-p1").value, 10);
+            const sets2 = parseInt(document.getElementById("sets-p2").value, 10);
+            const gems = document.getElementById("match-gems").value.trim();
+
+            if (!p1 || !p2 || p1 === p2) {
+                showToast("Vyber dvoch rôznych tenistov!", true);
+                return;
+            }
+            if (isNaN(sets1) || isNaN(sets2) || sets1 < 0 || sets2 < 0 || (sets1 === 0 && sets2 === 0)) {
+                showToast("Zadaj platný stav na sety!", true);
+                return;
+            }
+
+            state.matches.push({
+                id: "m_" + Date.now(),
+                date: date,
+                p1: p1,
+                p2: p2,
+                sets1: sets1,
+                sets2: sets2,
+                gems: gems
+            });
+
+            document.getElementById("match-gems").value = "";
+
+            sortMatchesChronologically();
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+
+            const lastMatch = computedMatches[computedMatches.length - 1];
+            showToast(`Zápas uložený! ${lastMatch.nameA}: ${lastMatch.eloAfterA.toFixed(1)}, ${lastMatch.nameB}: ${lastMatch.eloAfterB.toFixed(1)}`);
+
+            const firstTabBtn = document.querySelectorAll(".bottom-nav .nav-item")[0];
+            switchTab("sec-table", firstTabBtn);
+        }
+
+        function addRetroactiveMatch() {
+            const date = document.getElementById("hist-date").value;
+            const p1 = document.getElementById("hist-p1").value;
+            const p2 = document.getElementById("hist-p2").value;
+            const sets1 = parseInt(document.getElementById("hist-sets1").value, 10);
+            const sets2 = parseInt(document.getElementById("hist-sets2").value, 10);
+            const gems = document.getElementById("hist-gems").value.trim();
+
+            if (!date) {
+                showToast("Zadaj dátum zápasu!", true);
+                return;
+            }
+            if (!p1 || !p2 || p1 === p2) {
+                showToast("Vyber dvoch rôznych tenistov!", true);
+                return;
+            }
+            if (isNaN(sets1) || isNaN(sets2) || sets1 < 0 || sets2 < 0 || (sets1 === 0 && sets2 === 0)) {
+                showToast("Zadaj platný výsledok na sety!", true);
+                return;
+            }
+
+            const newId = "retro_" + Date.now();
+            state.matches.push({
+                id: newId,
+                date: date,
+                p1: p1,
+                p2: p2,
+                sets1: sets1,
+                sets2: sets2,
+                gems: gems
+            });
+
+            document.getElementById("hist-gems").value = "";
+
+            sortMatchesChronologically();
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+
+            const inserted = computedMatches.find(m => m.id === newId);
+            const pos = inserted ? inserted.index : computedMatches.length;
+            showToast(`Zápas zaradený na pozíciu #${pos} (${date}) a ELO prepočítané!`);
+        }
+
+        function moveMatchOrder(matchId, direction) {
+            const idx = state.matches.findIndex(m => m.id === matchId);
+            if (idx === -1) return;
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= state.matches.length) return;
+
+            if (state.matches[idx].date === state.matches[targetIdx].date) {
+                const temp = state.matches[idx];
+                state.matches[idx] = state.matches[targetIdx];
+                state.matches[targetIdx] = temp;
+                saveState();
+                recalculateAll();
+                populateSelects();
+                refreshAllViews();
+                showToast("Poradie zápasov v rámci dňa bolo upravené.");
+            } else {
+                showToast("Posúvať poradie šípkami možno len medzi zápasmi s rovnakým dátumom.", true);
+            }
+        }
+
+        function renderChartChips() {
+            const wrap = document.getElementById("chart-player-chips");
+            wrap.innerHTML = "";
+            document.getElementById("chart-steps-count").textContent = Math.max(0, timelinePoints.length - 1);
+            computedPlayers.forEach(p => {
+                const isVis = state.chartVisiblePlayers[p.id] !== false;
+                const chip = document.createElement("button");
+                chip.className = "player-chip" + (isVis ? " active" : "");
+                chip.innerHTML = `<span class="chip-dot" style="background:${p.color}; opacity:${isVis ? 1 : 0.3}"></span>${p.name} (${p.elo.toFixed(1)})`;
+                chip.onclick = () => {
+                    state.chartVisiblePlayers[p.id] = !isVis;
+                    saveState();
+                    renderChartChips();
+                    drawEloChart();
+                };
+                wrap.appendChild(chip);
+            });
+        }
+
+        function toggleAllChartPlayers() {
+            const activeIds = new Set();
+            computedMatches.forEach(m => { activeIds.add(m.p1); activeIds.add(m.p2); });
+
+            const allShown = computedPlayers.every(p => state.chartVisiblePlayers[p.id] !== false);
+            computedPlayers.forEach(p => {
+                state.chartVisiblePlayers[p.id] = allShown ? activeIds.has(p.id) : true;
+            });
+            saveState();
+            renderChartChips();
+            drawEloChart();
+        }
+
+        function drawEloChart(highlightStep = null) {
+            const canvas = document.getElementById("eloCanvas");
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const width = Math.max(rect.width, 300);
+            const height = Math.max(rect.height, 280);
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            const ctx = canvas.getContext("2d");
+            ctx.scale(dpr, dpr);
+
+            ctx.clearRect(0, 0, width, height);
+
+            const visiblePlayers = computedPlayers.filter(p => state.chartVisiblePlayers[p.id] !== false);
+            if (visiblePlayers.length === 0 || timelinePoints.length === 0) {
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "13px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Vyber aspoň jedného hráča pre zobrazenie grafu.", width / 2, height / 2);
+                return;
+            }
+
+            let minVal = Infinity, maxVal = -Infinity;
+            timelinePoints.forEach(pt => {
+                visiblePlayers.forEach(p => {
+                    const v = pt.elos[p.id];
+                    if (typeof v === "number") {
+                        if (v < minVal) minVal = v;
+                        if (v > maxVal) maxVal = v;
+                    }
+                });
+            });
+
+            if (minVal === Infinity) { minVal = 1400; maxVal = 1700; }
+            const padElo = Math.max((maxVal - minVal) * 0.12, 15);
+            const yMin = Math.floor((minVal - padElo) / 10) * 10;
+            const yMax = Math.ceil((maxVal + padElo) / 10) * 10;
+
+            const padL = 46, padR = 20, padT = 20, padB = 34;
+            const plotW = width - padL - padR;
+            const plotH = height - padT - padB;
+
+            const getX = (stepIdx) => {
+                if (timelinePoints.length <= 1) return padL + plotW / 2;
+                return padL + (stepIdx / (timelinePoints.length - 1)) * plotW;
+            };
+            const getY = (eloVal) => {
+                return padT + plotH - ((eloVal - yMin) / (yMax - yMin)) * plotH;
+            };
+
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+            ctx.lineWidth = 1;
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "11px sans-serif";
+            ctx.textAlign = "right";
+
+            const ySteps = 5;
+            for (let i = 0; i <= ySteps; i++) {
+                const val = yMin + ((yMax - yMin) / ySteps) * i;
+                const y = getY(val);
+                ctx.beginPath();
+                ctx.moveTo(padL, y);
+                ctx.lineTo(width - padR, y);
+                ctx.stroke();
+                ctx.fillText(val.toFixed(0), padL - 6, y + 4);
+            }
+
+            ctx.textAlign = "center";
+            const totalSteps = timelinePoints.length;
+            const labelInterval = totalSteps > 28 ? 5 : (totalSteps > 14 ? 2 : 1);
+            timelinePoints.forEach((pt, idx) => {
+                const x = getX(idx);
+                if (idx === 0 || idx === totalSteps - 1 || idx % labelInterval === 0) {
+                    ctx.fillText(pt.label, x, height - 10);
+                }
+            });
+
+            if (highlightStep !== null && timelinePoints[highlightStep]) {
+                const hx = getX(highlightStep);
+                ctx.strokeStyle = "rgba(249, 115, 22, 0.55)";
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(hx, padT);
+                ctx.lineTo(hx, padT + plotH);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            interactiveHitPoints = [];
+            const dotRadiusPlayed = totalSteps > 25 ? 3.3 : 4.2;
+            const dotRadiusIdle = totalSteps > 25 ? 2.0 : 2.8;
+
+            visiblePlayers.forEach(p => {
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = totalSteps > 25 ? 2.2 : 2.6;
+                ctx.beginPath();
+                timelinePoints.forEach((pt, idx) => {
+                    const val = pt.elos[p.id];
+                    const x = getX(idx);
+                    const y = getY(val);
+                    if (idx === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                timelinePoints.forEach((pt, idx) => {
+                    const val = pt.elos[p.id];
+                    const x = getX(idx);
+                    const y = getY(val);
+                    const isPlayedMatch = pt.match && (pt.match.p1 === p.id || pt.match.p2 === p.id);
+
+                    ctx.fillStyle = isPlayedMatch ? p.color : "#0c1425";
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = 1.8;
+                    ctx.beginPath();
+                    ctx.arc(x, y, isPlayedMatch || idx === 0 ? dotRadiusPlayed : dotRadiusIdle, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    interactiveHitPoints.push({ x, y, step: idx, player: p, elo: val, point: pt });
+                });
+            });
+        }
+
+        function setupCanvasEvents() {
+            const canvas = document.getElementById("eloCanvas");
+            if (!canvas) return;
+
+            const handlePointer = (clientX, clientY) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+
+                let best = null;
+                let minDist = 45;
+                interactiveHitPoints.forEach(hp => {
+                    const d = Math.hypot(hp.x - x, hp.y - y);
+                    if (d < minDist) {
+                        minDist = d;
+                        best = hp;
+                    }
+                });
+
+                if (best) {
+                    drawEloChart(best.step);
+                    const infoEl = document.getElementById("chart-point-info");
+                    infoEl.innerHTML = `<strong style="color:${best.player.color}">${best.player.name}: ${best.elo.toFixed(1)} ELO</strong> — ${best.point.title}`;
+                }
+            };
+
+            canvas.addEventListener("mousemove", e => handlePointer(e.clientX, e.clientY));
+            canvas.addEventListener("touchstart", e => {
+                if (e.touches[0]) handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+            canvas.addEventListener("touchmove", e => {
+                if (e.touches[0]) handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener("resize", () => {
+                if (document.getElementById("sec-chart").classList.contains("active")) {
+                    drawEloChart();
+                }
+            });
+        }
+
+        function renderH2H() {
+            const id1 = document.getElementById("h2h-p1").value;
+            const id2 = document.getElementById("h2h-p2").value;
+            const box = document.getElementById("h2h-content");
+            if (!id1 || !id2 || id1 === id2) {
+                box.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem;">Vyber dvoch rôznych tenistov pre zobrazenie vzájomnej bilancie.</div>`;
+                return;
+            }
+
+            const p1 = computedPlayers.find(p => p.id === id1);
+            const p2 = computedPlayers.find(p => p.id === id2);
+            if (!p1 || !p2) return;
+
+            const D = Number(state.config.D) || 200;
+            const K = Number(state.config.K) || 30;
+            const prob1 = 1 / (1 + Math.pow(10, (p2.elo - p1.elo) / D));
+            const prob2 = 1 - prob1;
+
+            const mutual = computedMatches.filter(m =>
+                (m.p1 === id1 && m.p2 === id2) || (m.p1 === id2 && m.p2 === id1)
+            );
+
+            let w1 = 0, w2 = 0, draws = 0;
+            let sets1 = 0, sets2 = 0;
+            let gems1 = 0, gems2 = 0;
+
+            mutual.forEach(m => {
+                const isFirst = m.p1 === id1;
+                const sA = isFirst ? Number(m.sets1) : Number(m.sets2);
+                const sB = isFirst ? Number(m.sets2) : Number(m.sets1);
+                sets1 += sA; sets2 += sB;
+
+                const g = parseGemsString(m.gems);
+                gems1 += isFirst ? g.g1 : g.g2;
+                gems2 += isFirst ? g.g2 : g.g1;
+
+                if (sA > sB) w1++;
+                else if (sB > sA) w2++;
+                else draws++;
+            });
+
+            const total = mutual.length;
+            const pct1 = total > 0 ? (w1 / total) * 100 : 50;
+            const pctD = total > 0 ? (draws / total) * 100 : 0;
+            const pct2 = total > 0 ? (w2 / total) * 100 : 50;
+
+            const winGain1 = (K * (1 - prob1)).toFixed(1);
+            const winGain2 = (K * (1 - prob2)).toFixed(1);
+
+            let matchesListHtml = mutual.length === 0
+                ? `<div style="color:var(--text-muted); font-size:0.82rem; margin-top:8px;">Títo hráči nemajú v zázname žiaden vzájomný zápas.</div>`
+                : mutual.slice().reverse().map(m => {
+                    const isFirst = m.p1 === id1;
+                    const sA = isFirst ? m.sets1 : m.sets2;
+                    const sB = isFirst ? m.sets2 : m.sets1;
+                    const dA = isFirst ? m.deltaA : m.deltaB;
+                    
+                    const sign = dA >= 0 ? `+${dA.toFixed(1)}` : dA.toFixed(1);
+                    const shiftColor = dA >= 0 ? 'var(--win)' : 'var(--loss)';
+                    
+                    return `
+                        <div class="match-card ${sA === sB ? 'draw-border' : ''}" style="margin-top:8px; padding:9px 11px;">
+                            <div>
+                                <div class="match-meta">Zápas #${m.index} · ${m.date}</div>
+                                <div class="match-title">${p1.name} vs ${p2.name} <span class="match-score-pill">${sA}:${sB}</span> <span class="match-gems">${m.gems ? '(' + m.gems + ')' : ''}</span></div>
+                            </div>
+                            <div style="text-align:right; font-size:0.78rem; font-weight:700; color:${shiftColor}">
+                                ${p1.name} ${sign}
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+            box.innerHTML = `
+                <div class="preview-box" style="margin-top:0;">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem;">
+                        <span style="color:${p1.color}">${p1.name} (${p1.elo.toFixed(1)})</span>
+                        <span style="color:var(--text-muted); font-size:0.82rem;">${total} vzájomné zápasy</span>
+                        <span style="color:${p2.color}">${p2.name} (${p2.elo.toFixed(1)})</span>
+                    </div>
+                    <div class="h2h-bar-wrap">
+                        <div class="h2h-seg-a" style="width:${pct1}%"></div>
+                        <div class="h2h-seg-d" style="width:${pctD}%"></div>
+                        <div class="h2h-seg-b" style="width:${pct2}%"></div>
+                    </div>
+                    <div class="grid-3" style="text-align:center; font-size:0.82rem; margin-top:8px;">
+                        <div><strong style="color:var(--win); font-size:1.05rem;">${w1}</strong><br>Výhry ${p1.name}</div>
+                        <div><strong style="color:var(--draw); font-size:1.05rem;">${draws}</strong><br>Remízy</div>
+                        <div><strong style="color:var(--blue-accent); font-size:1.05rem;">${w2}</strong><br>Výhry ${p2.name}</div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.76rem; color:var(--text-muted); margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
+                        <span>Sety: <strong>${sets1} : ${sets2}</strong> · Gemy: <strong>${gems1} : ${gems2}</strong></span>
+                        <span>Šanca na výhru: <strong>${(prob1*100).toFixed(1)}% : ${(prob2*100).toFixed(1)}%</strong></span>
+                    </div>
+                    <div style="font-size:0.74rem; color:var(--text-muted); margin-top:4px;">
+                        Ak vyhrá ${p1.name}: <strong style="color:var(--win)">+${winGain1} ELO</strong> | Ak vyhrá ${p2.name}: <strong style="color:var(--win)">+${winGain2} ELO</strong>
+                    </div>
+                </div>
+                ${matchesListHtml}
+            `;
+        }
+
+        function renderPlayerProfile() {
+            const id = document.getElementById("profile-select").value;
+            const p = computedPlayers.find(pl => pl.id === id);
+            const box = document.getElementById("profile-content");
+            if (!p) return;
+
+            const rank = computedPlayers.findIndex(pl => pl.id === id) + 1;
+            const winPct = p.matches > 0 ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1) : "0.0";
+            const startVal = p.effectiveStartElo;
+            const netChange = (p.elo - startVal).toFixed(1);
+            const netSign = netChange >= 0 ? `+${netChange}` : netChange;
+
+            box.innerHTML = `
+                <div class="grid-3" style="margin-bottom:10px;">
+                    <div class="stat-tile">
+                        <div class="stat-tile-label">Umiestnenie</div>
+                        <div class="stat-tile-value">#${rank}</div>
+                        <div class="stat-tile-sub">${p.elo.toFixed(1)} ELO</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-tile-label">Peak / Min ELO</div>
+                        <div class="stat-tile-value">${p.maxElo.toFixed(1)}</div>
+                        <div class="stat-tile-sub">Min: ${p.minElo.toFixed(1)}</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-tile-label">Celkový posun ELO</div>
+                        <div class="stat-tile-value" style="color:${netChange >= 0 ? 'var(--win)' : 'var(--loss)'}">${netSign}</div>
+                        <div class="stat-tile-sub">Štart: ${startVal.toFixed(1)}</div>
+                    </div>
+                </div>
+                <div class="stat-tile" style="text-align:left; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                    <span>Celková bilancia: <strong>${p.matches} záp. (${p.wins}V - ${p.losses}P - ${p.draws}R)</strong></span>
+                    <span>Úspešnosť: <strong style="color:var(--clay-light)">${winPct}%</strong></span>
+                    <span>Zaznamenané sety: <strong>${p.setsWon}:${p.setsLost}</strong> · Gemy: <strong>${p.gemsWon}:${p.gemsLost}</strong></span>
+                </div>
+            `;
+        }
+
+        function renderMatchHistory() {
+            const list = document.getElementById("history-list");
+            const filterId = document.getElementById("history-filter-player").value || "all";
+            const sortOrder = document.getElementById("history-sort-order").value || "desc";
+            document.getElementById("history-count-label").textContent = computedMatches.length;
+
+            let filtered = computedMatches.filter(m =>
+                filterId === "all" || m.p1 === filterId || m.p2 === filterId
+            );
+
+            if (sortOrder === "desc") {
+                filtered = filtered.slice().reverse();
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div style="color:var(--text-muted); font-size:0.84rem;">Žiadne zápasy pre zvolený filter.</div>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(m => {
+                const isDraw = Number(m.sets1) === Number(m.sets2);
+                const signA = m.deltaA >= 0 ? `+${m.deltaA.toFixed(1)}` : m.deltaA.toFixed(1);
+                const signB = m.deltaB >= 0 ? `+${m.deltaB.toFixed(1)}` : m.deltaB.toFixed(1);
+
+                const eloShiftHtml = `${m.nameA}: ${m.eloBeforeA.toFixed(1)} → <strong>${m.eloAfterA.toFixed(1)}</strong> (<span style="color:${m.deltaA >= 0 ? 'var(--win)' : 'var(--loss)'}">${signA}</span>) | ${m.nameB}: ${m.eloBeforeB.toFixed(1)} → <strong>${m.eloAfterB.toFixed(1)}</strong> (<span style="color:${m.deltaB >= 0 ? 'var(--win)' : 'var(--loss)'}">${signB}</span>)`;
+
+                const rawIdx = state.matches.findIndex(x => x.id === m.id);
+                const hasSameDatePrev = rawIdx > 0 && state.matches[rawIdx - 1].date === m.date;
+                const hasSameDateNext = rawIdx < state.matches.length - 1 && state.matches[rawIdx + 1].date === m.date;
+
+                let orderBtns = "";
+                if (hasSameDatePrev) {
+                    orderBtns += `<button class="icon-btn-alt" onclick="moveMatchOrder('${m.id}', -1)" title="Posunúť skôr v rámci dňa">↑</button>`;
+                }
+                if (hasSameDateNext) {
+                    orderBtns += `<button class="icon-btn-alt" onclick="moveMatchOrder('${m.id}', 1)" title="Posunúť neskôr v rámci dňa">↓</button>`;
+                }
+
+                return `
+                    <div class="match-card ${isDraw ? 'draw-border' : ''}">
+                        <div>
+                            <div class="match-meta">
+                                <span>#${m.index} · ${m.date}</span>
+                                <span>· E: ${(m.probA*100).toFixed(0)}% / ${(m.probB*100).toFixed(0)}%</span>
+                            </div>
+                            <div class="match-title">
+                                ${m.nameA} vs ${m.nameB}
+                                <span class="match-score-pill">${m.sets1}:${m.sets2}</span>
+                                <span class="match-gems">${m.gems ? '(' + m.gems + ')' : ''}</span>
+                            </div>
+                            <div class="match-elo-Shift">
+                                ${eloShiftHtml}
+                            </div>
+                        </div>
+                        <div class="match-actions">
+                            ${orderBtns}
+                            <button class="icon-btn" onclick="deleteMatch('${m.id}')" title="Vymazať zápas a prepočítať ELO">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function deleteMatch(matchId) {
+            if (!confirm("Naozaj chceš vymazať tento zápas? ELO všetkých hráčov sa automaticky prepočíta.")) return;
+            state.matches = state.matches.filter(m => m.id !== matchId);
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            showToast("Zápas bol vymazaný a tabuľka prepočítaná.");
+        }
+
+        function updateParams() {
+            const kVal = parseFloat(document.getElementById("cfg-k").value);
+            const dVal = parseFloat(document.getElementById("cfg-d").value);
+            state.config.K = isNaN(kVal) || kVal <= 0 ? 30 : kVal;
+            state.config.D = isNaN(dVal) || dVal <= 0 ? 200 : dVal;
+            saveState();
+            recalculateAll();
+            refreshAllViews();
+            showToast(`Parametre upravené (K=${state.config.K}, D=${state.config.D})`);
+        }
+
+        function freezeCurrentAsBaseline() {
+            if (!confirm("Chceš zafixovať aktuálne ELO a štatistiky ako novú štartovaciu čiaru a vyčistiť zoznam doterajších zápasov?")) return;
+            state.players = computedPlayers.map(p => ({
+                id: p.id,
+                name: p.name,
+                color: p.color
+            }));
+            state.matches = [];
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            showToast("Aktuálna tabuľka bola zafixovaná ako východiskový stav!");
+        }
+
+        function resetToThreadDefault() {
+            if (!confirm("Obnoviť pôvodnú históriu 55 zápasov? Všetky neskôr pridané zmeny sa vymažú.")) return;
+            localStorage.removeItem(STORAGE_KEY);
+            loadDefaults();
+            sortMatchesChronologically();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            showToast("Dáta boli obnovené na novú predvolenú históriu 55 zápasov!");
+        }
+
+        function exportBackupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const a = document.createElement("a");
+            a.href = dataStr;
+            a.download = `ELO2MASTER_v5_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.click();
+        }
+
+        function importBackupJSON(ev) {
+            const file = ev.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.players && Array.isArray(imported.players)) {
+                        state = {
+                            config: { K: 30, D: 200, calcFrom1500: true, ...(imported.config || {}) },
+                            players: imported.players,
+                            matches: imported.matches || [],
+                            chartVisiblePlayers: imported.chartVisiblePlayers || {}
+                        };
+                        sortMatchesChronologically();
+                        saveState();
+                        recalculateAll();
+                        populateSelects();
+                        refreshAllViews();
+                        showToast("Záloha bola úspešne načítaná!");
+                    } else {
+                        showToast("Neplatný JSON súbor!", true);
+                    }
+                } catch (err) {
+                    showToast("Chyba pri čítaní súboru!", true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportTableCSV() {
+            let csv = "Poradie;Meno;ELO;Zapasy;Vyhry;Prehry;Remizy;Uspesnost (%)\n";
+            computedPlayers.forEach((p, i) => {
+                const winPct = p.matches > 0 ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1) : "0.0";
+                csv += `${i+1};${p.name};${p.elo.toFixed(1).replace('.', ',')};${p.matches};${p.wins};${p.losses};${p.draws};${winPct.replace('.', ',')}\n`;
+            });
+            const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `ELO2MASTER_v5_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.click();
+        }
+
+        function openTvModal() {
+            document.getElementById("tv-modal").classList.add("open");
+            renderTvCanvas();
+        }
+
+        function closeTvModal() {
+            document.getElementById("tv-modal").classList.remove("open");
+        }
+
+        function renderTvCanvas() {
+            const canvas = document.getElementById("tvCanvas");
+            const ctx = canvas.getContext("2d");
+            const W = canvas.width;
+            const H = canvas.height;
+
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+            bgGrad.addColorStop(0, "#5c2010");
+            bgGrad.addColorStop(0.35, "#9a3b1c");
+            bgGrad.addColorStop(1, "#692511");
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(120, H * 0.68);
+            ctx.lineTo(W - 120, H * 0.68);
+            ctx.moveTo(260, H * 0.30);
+            ctx.lineTo(80, H * 0.92);
+            ctx.moveTo(W - 260, H * 0.30);
+            ctx.lineTo(W - 80, H * 0.92);
+            ctx.moveTo(W / 2, H * 0.30);
+            ctx.lineTo(W / 2, H * 0.68);
+            ctx.stroke();
+
+            const radGrad = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, W*0.65);
+            radGrad.addColorStop(0, "rgba(9, 14, 26, 0.15)");
+            radGrad.addColorStop(1, "rgba(9, 14, 26, 0.78)");
+            ctx.fillStyle = radGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            const tableX = 130;
+            const tableW = W - 260;
+            const topY = 95;
+
+            ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
+            ctx.fillRect(tableX, topY, tableW, 64);
+            ctx.fillStyle = "#f97316";
+            ctx.fillRect(tableX, topY, 10, 64);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 28px sans-serif";
+            ctx.textAlign = "left";
+            ctx.fillText("ELO2MASTER V5 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "bold 20px sans-serif";
+            ctx.textAlign = "right";
+            const todayStr = new Date().toLocaleDateString("sk-SK");
+            ctx.fillText(`AKTUALIZÁCIA: ${todayStr}`, tableX + tableW - 24, topY + 41);
+
+            const headY = topY + 76;
+            const headH = 54;
+            ctx.fillStyle = "rgba(30, 41, 59, 0.95)";
+            ctx.fillRect(tableX, headY, tableW, headH);
+
+            const cols = [
+                { label: "POR", x: tableX + 45, align: "center" },
+                { label: "MENO", x: tableX + 120, align: "left" },
+                { label: "ELO", x: tableX + 520, align: "center" },
+                { label: "ZÁPASY", x: tableX + 690, align: "center" },
+                { label: "VÝHRY", x: tableX + 840, align: "center" },
+                { label: "PREHRY", x: tableX + 990, align: "center" },
+                { label: "REMÍZY", x: tableX + 1140, align: "center" },
+                { label: "ÚSPEŠNOSŤ (%)", x: tableX + 1275, align: "center" }
+            ];
+
+            ctx.fillStyle = "#cbd5e1";
+            ctx.font = "bold 20px sans-serif";
+            cols.forEach(c => {
+                ctx.textAlign = c.align;
+                ctx.fillText(c.label, c.x, headY + 35);
+            });
+
+            const maxRows = Math.min(computedPlayers.length, 8);
+            const rowH = Math.min(82, Math.floor((H - headY - headH - 80) / maxRows));
+
+            computedPlayers.slice(0, maxRows).forEach((p, i) => {
+                const ry = headY + headH + i * (rowH + 6) + 6;
+                ctx.fillStyle = i % 2 === 0 ? "rgba(226, 232, 240, 0.92)" : "rgba(203, 213, 225, 0.90)";
+                ctx.fillRect(tableX, ry, tableW, rowH);
+
+                ctx.fillStyle = "rgba(186, 230, 253, 0.65)";
+                ctx.fillRect(tableX + 430, ry, 180, rowH);
+
+                const winPct = p.matches > 0 ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1) : "0.0";
+                const textY = ry + rowH / 2 + 11;
+
+                ctx.fillStyle = "#0f172a";
+                ctx.font = "bold 31px sans-serif";
+
+                ctx.textAlign = "center";
+                ctx.fillText(`${i + 1}`, cols[0].x, textY);
+
+                ctx.textAlign = "left";
+                ctx.fillText(p.name.toUpperCase(), cols[1].x, textY);
+
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#0369a1";
+                ctx.fillText(p.elo.toFixed(1), cols[2].x, textY);
+
+                ctx.fillStyle = "#0f172a";
+                ctx.fillText(`${p.matches}`, cols[3].x, textY);
+                ctx.fillText(`${p.wins}`, cols[4].x, textY);
+                ctx.fillText(`${p.losses}`, cols[5].x, textY);
+                ctx.fillText(`${p.draws}`, cols[6].x, textY);
+                ctx.fillText(`${winPct}%`, cols[7].x, textY);
+            });
+        }
+
+        function downloadTvGraphic() {
+            const canvas = document.getElementById("tvCanvas");
+            const a = document.createElement("a");
+            a.href = canvas.toDataURL("image/png");
+            a.download = `ELO2MASTER_V5_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.click();
+        }
+
+        function switchTab(secId, btnEl) {
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+            document.getElementById(secId).classList.add("active");
+
+            document.querySelectorAll(".bottom-nav .nav-item").forEach(b => b.classList.remove("active"));
+            if (btnEl) btnEl.classList.add("active");
+
+            if (secId === "sec-chart") {
+                setTimeout(() => drawEloChart(), 30);
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.style.background = isError ? "#7f1d1d" : "#065f46";
+            t.style.borderColor = isError ? "#f87171" : "#34d399";
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 3200);
+        }
+
+        window.addEventListener("DOMContentLoaded", initApp);
+    </script>
+</body>
+</html>
