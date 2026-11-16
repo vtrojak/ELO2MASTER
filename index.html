@@ -797,7 +797,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 5)</span>
+                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 8)</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1028,7 +1028,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 5)
+                        Aktívny režim histórie (Verzia 8)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1196,7 +1196,7 @@
     </nav>
 
     <script>
-        const STORAGE_KEY = "ELO2MASTER_DB_V5";
+        const STORAGE_KEY = "ELO2MASTER_DB_V8";
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -1505,6 +1505,16 @@
             });
 
             computedPlayers = Object.values(pMap).sort((a, b) => b.elo - a.elo);
+
+            // Posun (delta) ukazovať len na základe najnovšieho zápasu
+            computedPlayers.forEach(p => p.lastDelta = 0);
+            if (computedMatches.length > 0) {
+                const lastM = computedMatches[computedMatches.length - 1];
+                const pA = computedPlayers.find(p => p.id === lastM.p1);
+                const pB = computedPlayers.find(p => p.id === lastM.p2);
+                if (pA) pA.lastDelta = lastM.deltaA;
+                if (pB) pB.lastDelta = lastM.deltaB;
+            }
         }
 
         function populateSelects() {
@@ -1614,7 +1624,7 @@
                             <strong>${p.name}</strong>
                         </div>
                     </td>
-                    <td class="text-right"><span class="elo-pill">${p.elo.toFixed(1)}</span>${deltaHtml}</td>
+                    <td class="text-right">${deltaHtml}<span class="elo-pill">${p.elo.toFixed(1)}</span></td>
                     <td class="text-right">${p.matches}</td>
                     <td class="text-right" style="color:var(--win); font-weight:700;">${p.wins}</td>
                     <td class="text-right" style="color:var(--loss);">${p.losses}</td>
@@ -2127,12 +2137,17 @@
                         <div><strong style="color:var(--draw); font-size:1.05rem;">${draws}</strong><br>Remízy</div>
                         <div><strong style="color:var(--blue-accent); font-size:1.05rem;">${w2}</strong><br>Výhry ${p2.name}</div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.76rem; color:var(--text-muted); margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
-                        <span>Sety: <strong>${sets1} : ${sets2}</strong> · Gemy: <strong>${gems1} : ${gems2}</strong></span>
-                        <span>Šanca na výhru: <strong>${(prob1*100).toFixed(1)}% : ${(prob2*100).toFixed(1)}%</strong></span>
+                    <div style="font-size:0.78rem; color:var(--text-main); margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-muted);">1) Sety a Gemy:</span>
+                        <span><strong>${sets1} : ${sets2}</strong> (Sety) · <strong>${gems1} : ${gems2}</strong> (Gemy)</span>
                     </div>
-                    <div style="font-size:0.74rem; color:var(--text-muted); margin-top:4px;">
-                        Ak vyhrá ${p1.name}: <strong style="color:var(--win)">+${winGain1} ELO</strong> | Ak vyhrá ${p2.name}: <strong style="color:var(--win)">+${winGain2} ELO</strong>
+                    <div style="font-size:0.78rem; color:var(--text-main); margin-top:8px; padding-top:8px; border-top:1px solid rgba(148,163,184,0.08); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-muted);">2) Šanca na výhru:</span>
+                        <span><strong style="color:${p1.color}">${p1.name} ${(prob1*100).toFixed(1)}%</strong> : <strong style="color:${p2.color}">${p2.name} ${(prob2*100).toFixed(1)}%</strong></span>
+                    </div>
+                    <div style="font-size:0.78rem; color:var(--text-main); margin-top:8px; padding-top:8px; border-top:1px solid rgba(148,163,184,0.08); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-muted);">3) Zmena ELO pri výhre:</span>
+                        <span>Ak vyhrá ${p1.name}: <strong style="color:var(--win)">+${winGain1}</strong> | Ak vyhrá ${p2.name}: <strong style="color:var(--win)">+${winGain2}</strong></span>
                     </div>
                 </div>
                 ${matchesListHtml}
@@ -2291,7 +2306,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v5_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v8_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2335,7 +2350,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v5_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v8_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
