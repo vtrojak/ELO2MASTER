@@ -797,11 +797,11 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 8)</span>
+                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 10)</span>
                 </div>
             </div>
             <div class="header-badges">
-                <span class="param-pill" id="header-params">K=30 · D=200</span>
+                <span class="param-pill" id="header-params">K=32 · D=200</span>
                 <button class="tv-btn" onclick="openTvModal()" title="Vygenerovať televíznu grafiku">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
                     TV Grafika
@@ -1028,7 +1028,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 8)
+                        Aktívny režim histórie (Verzia 10)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1128,8 +1128,8 @@
 
                 <div class="grid-2" style="margin-bottom: 12px;">
                     <div class="form-group">
-                        <label for="cfg-k">Koeficient K (default 30)</label>
-                        <input type="number" id="cfg-k" value="30" step="1" onchange="updateParams()">
+                        <label for="cfg-k">Koeficient K (default 32)</label>
+                        <input type="number" id="cfg-k" value="32" step="1" onchange="updateParams()">
                     </div>
                     <div class="form-group">
                         <label for="cfg-d">Faktor D (default 200)</label>
@@ -1196,7 +1196,7 @@
     </nav>
 
     <script>
-        const STORAGE_KEY = "ELO2MASTER_DB_V8";
+        const STORAGE_KEY = "ELO2MASTER_DB_V10";
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -1276,11 +1276,11 @@
             { id: "m55_52", date: "2026-06-14", p1: "belo", p2: "vlado", sets1: 1, sets2: 1, gems: "4:6 7:6" },
             { id: "m55_53", date: "2026-06-14", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:3 6:3" },
             { id: "m55_54", date: "2026-06-14", p1: "tibor", p2: "belo", sets1: 2, sets2: 1, gems: "6:7 7:6 6:3" },
-            { id: "m55_55", date: "2026-06-15", p1: "vlado", p2: "tibor", sets1: 3, sets2: 0, gems: "6:2 6:4 6:4" }
+            { id: "m55_55", date: "2026-06-15", p1: "vlado", p2: "belo", sets1: 3, sets2: 0, gems: "6:2 6:4 6:4" }
         ];
 
         let state = {
-            config: { K: 30, D: 200, calcFrom1500: true },
+            config: { K: 32, D: 200, calcFrom1500: true },
             players: [],
             matches: [],
             chartVisiblePlayers: {}
@@ -1296,7 +1296,7 @@
             if (raw) {
                 try {
                     const parsed = JSON.parse(raw);
-                    state.config = { K: 30, D: 200, calcFrom1500: true, ...(parsed.config || {}) };
+                    state.config = { K: 32, D: 200, calcFrom1500: true, ...(parsed.config || {}) };
                     state.players = parsed.players || JSON.parse(JSON.stringify(INITIAL_PLAYERS));
                     state.matches = parsed.matches || JSON.parse(JSON.stringify(INITIAL_MATCHES));
                     state.chartVisiblePlayers = parsed.chartVisiblePlayers || {};
@@ -1335,7 +1335,7 @@
         }
 
         function loadDefaults() {
-            state.config = { K: 30, D: 200, calcFrom1500: true };
+            state.config = { K: 32, D: 200, calcFrom1500: true };
             state.players = JSON.parse(JSON.stringify(INITIAL_PLAYERS));
             state.matches = JSON.parse(JSON.stringify(INITIAL_MATCHES));
             state.chartVisiblePlayers = {};
@@ -1377,8 +1377,18 @@
             return { g1, g2 };
         }
 
+        function formatGemsForOrder(gemsStr, isFirst) {
+            if (!gemsStr || !gemsStr.trim()) return "";
+            if (isFirst) return gemsStr.trim();
+            return gemsStr.trim().split(/\s+/).map(part => {
+                const m = part.match(/^(\d+)([:\-])(\d+)(.*)$/);
+                if (m) return `${m[3]}${m[2]}${m[1]}${m[4]}`;
+                return part;
+            }).join(" ");
+        }
+
         function recalculateAll() {
-            const K = Number(state.config.K) || 30;
+            const K = Number(state.config.K) || 32;
             const D = Number(state.config.D) || 200;
 
             document.getElementById("header-params").textContent = `K=${K} · D=${D}`;
@@ -1609,7 +1619,7 @@
                     deltaHtml = `<span class="delta-tag delta-down">▼${p.lastDelta.toFixed(1)}</span>`;
                 }
 
-                const last5 = p.form.slice(-5);
+                const last5 = p.form.slice(-5).reverse();
                 const formHtml = last5.length > 0
                     ? `<div class="form-dots">` + last5.map(f => `<span class="form-dot form-${f}">${f === 'W' ? 'V' : (f === 'D' ? 'R' : 'P')}</span>`).join("") + `</div>`
                     : `<span style="color:var(--text-muted); font-size:0.72rem;">—</span>`;
@@ -1705,7 +1715,7 @@
             const p2 = computedPlayers.find(p => p.id === id2);
             if (!p1 || !p2) return;
 
-            const K = Number(state.config.K) || 30;
+            const K = Number(state.config.K) || 32;
             const D = Number(state.config.D) || 200;
 
             const e1 = 1 / (1 + Math.pow(10, (p2.elo - p1.elo) / D));
@@ -2061,7 +2071,7 @@
             if (!p1 || !p2) return;
 
             const D = Number(state.config.D) || 200;
-            const K = Number(state.config.K) || 30;
+            const K = Number(state.config.K) || 32;
             const prob1 = 1 / (1 + Math.pow(10, (p2.elo - p1.elo) / D));
             const prob2 = 1 - prob1;
 
@@ -2103,6 +2113,7 @@
                     const sA = isFirst ? m.sets1 : m.sets2;
                     const sB = isFirst ? m.sets2 : m.sets1;
                     const dA = isFirst ? m.deltaA : m.deltaB;
+                    const gemsFormatted = formatGemsForOrder(m.gems, isFirst);
                     
                     const sign = dA >= 0 ? `+${dA.toFixed(1)}` : dA.toFixed(1);
                     const shiftColor = dA >= 0 ? 'var(--win)' : 'var(--loss)';
@@ -2111,7 +2122,7 @@
                         <div class="match-card ${sA === sB ? 'draw-border' : ''}" style="margin-top:8px; padding:9px 11px;">
                             <div>
                                 <div class="match-meta">Zápas #${m.index} · ${m.date}</div>
-                                <div class="match-title">${p1.name} vs ${p2.name} <span class="match-score-pill">${sA}:${sB}</span> <span class="match-gems">${m.gems ? '(' + m.gems + ')' : ''}</span></div>
+                                <div class="match-title">${p1.name} vs ${p2.name} <span class="match-score-pill">${sA}:${sB}</span> <span class="match-gems">${gemsFormatted ? '(' + gemsFormatted + ')' : ''}</span></div>
                             </div>
                             <div style="text-align:right; font-size:0.78rem; font-weight:700; color:${shiftColor}">
                                 ${p1.name} ${sign}
@@ -2268,7 +2279,7 @@
         function updateParams() {
             const kVal = parseFloat(document.getElementById("cfg-k").value);
             const dVal = parseFloat(document.getElementById("cfg-d").value);
-            state.config.K = isNaN(kVal) || kVal <= 0 ? 30 : kVal;
+            state.config.K = isNaN(kVal) || kVal <= 0 ? 32 : kVal;
             state.config.D = isNaN(dVal) || dVal <= 0 ? 200 : dVal;
             saveState();
             recalculateAll();
@@ -2306,7 +2317,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v8_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v10_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2319,7 +2330,7 @@
                     const imported = JSON.parse(e.target.result);
                     if (imported.players && Array.isArray(imported.players)) {
                         state = {
-                            config: { K: 30, D: 200, calcFrom1500: true, ...(imported.config || {}) },
+                            config: { K: 32, D: 200, calcFrom1500: true, ...(imported.config || {}) },
                             players: imported.players,
                             matches: imported.matches || [],
                             chartVisiblePlayers: imported.chartVisiblePlayers || {}
@@ -2350,7 +2361,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v8_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v10_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -2407,7 +2418,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V5 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V10 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "#94a3b8";
             ctx.font = "bold 20px sans-serif";
@@ -2478,7 +2489,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V5_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V10_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
