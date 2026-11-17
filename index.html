@@ -797,14 +797,14 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 11)</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 14</span>
                 </div>
             </div>
             <div class="header-badges">
                 <span class="param-pill" id="header-params">K=32 · D=200</span>
                 <button class="tv-btn" onclick="openTvModal()" title="Vygenerovať televíznu grafiku">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                    TV Grafika
+                    TV
                 </button>
             </div>
         </div>
@@ -910,7 +910,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Výsledok na sety (rýchla voľba alebo vlastné číslo)</label>
+                    <label>Výsledok na sety</label>
                     <div class="grid-2">
                         <div>
                             <label for="sets-p1" style="font-size:0.7rem;">Sety Hráč A</label>
@@ -921,14 +921,7 @@
                             <input type="number" id="sets-p2" value="0" min="0" max="5" oninput="updateMatchPreview()">
                         </div>
                     </div>
-                    <div class="preset-row">
-                        <button type="button" class="preset-btn active" onclick="setQuickSets(2,0,this)">2 : 0</button>
-                        <button type="button" class="preset-btn" onclick="setQuickSets(2,1,this)">2 : 1</button>
-                        <button type="button" class="preset-btn" onclick="setQuickSets(3,0,this)">3 : 0</button>
-                        <button type="button" class="preset-btn" onclick="setQuickSets(1,1,this)">1 : 1 (Remíza)</button>
-                        <button type="button" class="preset-btn" onclick="setQuickSets(1,2,this)">1 : 2</button>
-                        <button type="button" class="preset-btn" onclick="setQuickSets(0,2,this)">0 : 2</button>
-                    </div>
+
                 </div>
 
                 <div class="form-group">
@@ -1028,7 +1021,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 11)
+                        Aktívny režim histórie (Verzia 14)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1083,15 +1076,7 @@
                             <input type="number" id="hist-sets2" value="0" min="0" max="5">
                         </div>
                     </div>
-                    <div class="preset-row" id="hist-preset-row">
-                        <button type="button" class="preset-btn active" onclick="setHistQuickSets(2,0,this)">2 : 0</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(2,1,this)">2 : 1</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(3,0,this)">3 : 0</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,0,this)">1 : 0</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,1,this)">1 : 1</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(1,2,this)">1 : 2</button>
-                        <button type="button" class="preset-btn" onclick="setHistQuickSets(0,2,this)">0 : 2</button>
-                    </div>
+
                 </div>
 
                 <button class="btn btn-primary" onclick="addRetroactiveMatch()">+ Vložiť zápas do histórie a prepočítať</button>
@@ -1196,7 +1181,7 @@
     </nav>
 
     <script>
-        const STORAGE_KEY = "ELO2MASTER_DB_V11";
+        const STORAGE_KEY = "ELO2MASTER_DB_V14";
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -1690,20 +1675,9 @@
             showToast(`Hráč ${name} bol pridaný do systému s počiatočným ELO 1500!`);
         }
 
-        function setQuickSets(s1, s2, btnEl) {
-            document.getElementById("sets-p1").value = s1;
-            document.getElementById("sets-p2").value = s2;
-            document.querySelectorAll("#sec-match .preset-btn").forEach(b => b.classList.remove("active"));
-            if (btnEl) btnEl.classList.add("active");
-            updateMatchPreview();
-        }
 
-        function setHistQuickSets(s1, s2, btnEl) {
-            document.getElementById("hist-sets1").value = s1;
-            document.getElementById("hist-sets2").value = s2;
-            document.querySelectorAll("#hist-preset-row .preset-btn").forEach(b => b.classList.remove("active"));
-            if (btnEl) btnEl.classList.add("active");
-        }
+
+
 
         function updateMatchPreview() {
             const id1 = document.getElementById("match-p1").value;
@@ -2317,7 +2291,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v11_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v14_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2361,7 +2335,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v11_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v14_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -2406,8 +2380,8 @@
             ctx.fillStyle = radGrad;
             ctx.fillRect(0, 0, W, H);
 
-            const tableX = 130;
-            const tableW = W - 260;
+            const tableX = 80;
+            const tableW = W - 160;
             const topY = 95;
 
             ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
@@ -2418,7 +2392,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V11 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V14 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "#94a3b8";
             ctx.font = "bold 20px sans-serif";
@@ -2432,14 +2406,14 @@
             ctx.fillRect(tableX, headY, tableW, headH);
 
             const cols = [
-                { label: "POR", x: tableX + 45, align: "center" },
-                { label: "MENO", x: tableX + 120, align: "left" },
-                { label: "ELO", x: tableX + 520, align: "center" },
-                { label: "ZÁPASY", x: tableX + 690, align: "center" },
-                { label: "VÝHRY", x: tableX + 840, align: "center" },
-                { label: "PREHRY", x: tableX + 990, align: "center" },
-                { label: "REMÍZY", x: tableX + 1140, align: "center" },
-                { label: "ÚSPEŠNOSŤ (%)", x: tableX + 1275, align: "center" }
+                { label: "POR", x: tableX + 50, align: "center" },
+                { label: "MENO", x: tableX + 130, align: "left" },
+                { label: "ELO", x: tableX + 530, align: "center" },
+                { label: "ZÁPASY", x: tableX + 710, align: "center" },
+                { label: "VÝHRY", x: tableX + 870, align: "center" },
+                { label: "PREHRY", x: tableX + 1030, align: "center" },
+                { label: "REMÍZY", x: tableX + 1185, align: "center" },
+                { label: "ÚSPEŠNOSŤ (%)", x: tableX + 1345, align: "center" }
             ];
 
             ctx.fillStyle = "#cbd5e1";
@@ -2458,7 +2432,7 @@
                 ctx.fillRect(tableX, ry, tableW, rowH);
 
                 ctx.fillStyle = "rgba(186, 230, 253, 0.65)";
-                ctx.fillRect(tableX + 430, ry, 180, rowH);
+                ctx.fillRect(tableX + 440, ry, 180, rowH);
 
                 const winPct = p.matches > 0 ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1) : "0.0";
                 const textY = ry + rowH / 2 + 11;
@@ -2489,7 +2463,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V11_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V14_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
