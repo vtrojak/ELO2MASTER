@@ -797,7 +797,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 10)</span>
+                    <span class="brand-sub" id="brand-mode-sub">Tenisový ELO Rebríček & Analytika (Verzia 11)</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1028,7 +1028,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 10)
+                        Aktívny režim histórie (Verzia 11)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1196,7 +1196,7 @@
     </nav>
 
     <script>
-        const STORAGE_KEY = "ELO2MASTER_DB_V10";
+        const STORAGE_KEY = "ELO2MASTER_DB_V11";
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -1253,7 +1253,7 @@
             { id: "m55_29", date: "2025-03-20", p1: "belo", p2: "tono", sets1: 2, sets2: 1, gems: "6:4 6:3 1:6" },
             { id: "m55_30", date: "2025-03-28", p1: "tono", p2: "belo", sets1: 2, sets2: 1, gems: "2:6 6:3 6:4" },
             { id: "m55_31", date: "2025-04-06", p1: "vlado", p2: "belo", sets1: 2, sets2: 0, gems: "6:4 6:4" },
-            { id: "m55_32", date: "2025-04-14", p1: "belo", p2: "tibor", sets1: 2, sets2: 0, gems: "6:3 6:3" },
+            { id: "m55_32", date: "2025-04-14", p1: "belo", p2: "tibor", sets1: 2, sets2: 1, gems: "6:2 2:6 6:3" },
             { id: "m55_33", date: "2025-04-22", p1: "belo", p2: "tibor", sets1: 2, sets2: 1, gems: "6:2 6:7 6:2" },
             { id: "m55_34", date: "2025-05-02", p1: "vlado", p2: "belo", sets1: 3, sets2: 0, gems: "6:0 6:4 7:5" },
             { id: "m55_35", date: "2025-05-10", p1: "tono", p2: "tibor", sets1: 3, sets2: 0, gems: "6:3 6:0 7:5" },
@@ -2317,7 +2317,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v10_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v11_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2361,7 +2361,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v10_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v11_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -2418,7 +2418,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V10 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V11 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "#94a3b8";
             ctx.font = "bold 20px sans-serif";
@@ -2489,7 +2489,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V10_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V11_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
