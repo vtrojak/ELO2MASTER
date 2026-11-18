@@ -1167,7 +1167,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.26</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.27</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1382,7 +1382,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.26)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.27)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1505,7 +1505,7 @@
                                 <span><i class="fa-solid fa-file-shield"></i> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.26_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.27_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -1645,11 +1645,11 @@
             <div class="card-header">
                 <div class="card-title">
                     <span class="card-title-dot"></span>
-                    Televízna infografika (Antukový kurt · Bez tvárí)
+                    Televízna infografika FullHD
                 </div>
                 <button class="icon-btn" onclick="closeTvModal()">Zavrieť ✕</button>
             </div>
-            <canvas id="tvCanvas" width="1600" height="900"></canvas>
+            <canvas id="tvCanvas" width="1920" height="1080"></canvas>
             <div class="grid-2">
                 <button class="btn btn-primary" onclick="downloadTvGraphic()">Stiahnuť PNG grafiku (HD)</button>
                 <button class="btn btn-secondary" onclick="closeTvModal()">Späť do aplikácie</button>
@@ -1949,6 +1949,7 @@
             populateSelects();
             refreshAllViews();
             setupCanvasEvents();
+            ensureTvBackgroundLoaded();
 
             // Automaticky skontrolovať externý databaza.json na GitHube
             await syncFromRemoteJSON(false);
@@ -3598,7 +3599,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = customFilename || `ELO2MASTER_v1.26_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = customFilename || `ELO2MASTER_v1.27_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -3648,136 +3649,423 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.26_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.27_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
+        }
+
+        let tvBgImage = null;
+        let tvBgLoaded = false;
+        let tvBgLoading = false;
+        let tvBgIsTainted = false;
+
+        async function ensureTvBackgroundLoaded(callback) {
+            if (tvBgLoaded) {
+                if (callback) callback();
+                return;
+            }
+            if (tvBgLoading) return;
+            tvBgLoading = true;
+
+            const candidates = ["./TV.jpeg", "./tv.jpeg", "./TV.jpg", "./tv.jpg"];
+
+            // 1. Pokus o načítanie cez fetch -> Blob -> DataURL (nikdy neznečistí / netaintuje canvas pri sťahovaní PNG)
+            for (const url of candidates) {
+                try {
+                    const resp = await fetch(url + "?t=" + Date.now(), { cache: "no-store" });
+                    if (resp.ok) {
+                        const blob = await resp.blob();
+                        const dataUrl = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                        const img = new Image();
+                        await new Promise((resolve, reject) => {
+                            img.onload = resolve;
+                            img.onerror = reject;
+                            img.src = dataUrl;
+                        });
+                        tvBgImage = img;
+                        tvBgLoaded = true;
+                        tvBgIsTainted = false;
+                        tvBgLoading = false;
+                        if (callback) callback();
+                        return;
+                    }
+                } catch (e) {
+                    // Pokračovať na ďalší kandidát alebo lokálny fallback
+                }
+            }
+
+            // 2. Fallback pre priame otvorenie súboru z disku (file:// protokol)
+            const fallbackImg = new Image();
+            fallbackImg.onload = () => {
+                tvBgImage = fallbackImg;
+                tvBgLoaded = true;
+                tvBgIsTainted = (window.location.protocol === "file:");
+                tvBgLoading = false;
+                if (callback) callback();
+            };
+            fallbackImg.onerror = () => {
+                tvBgImage = null;
+                tvBgLoaded = false;
+                tvBgIsTainted = false;
+                tvBgLoading = false;
+                if (callback) callback();
+            };
+            fallbackImg.src = "./TV.jpeg";
+        }
+
+        function drawRoundedRectPath(ctx, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function drawTvBackgroundLayer(targetCtx, W, H, forceFallbackBg = false) {
+            if (!forceFallbackBg && tvBgLoaded && tvBgImage && tvBgImage.naturalWidth > 0) {
+                const imgW = tvBgImage.naturalWidth;
+                const imgH = tvBgImage.naturalHeight;
+                const scale = Math.max(W / imgW, H / imgH);
+                const drawW = imgW * scale;
+                const drawH = imgH * scale;
+                const offsetX = (W - drawW) / 2;
+                const offsetY = (H - drawH) / 2;
+                targetCtx.drawImage(tvBgImage, offsetX, offsetY, drawW, drawH);
+
+                // Jemná vinetácia pre hĺbku obrazu
+                const vig = targetCtx.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, W * 0.72);
+                vig.addColorStop(0, "rgba(0, 18, 15, 0.08)");
+                vig.addColorStop(1, "rgba(0, 12, 10, 0.45)");
+                targetCtx.fillStyle = vig;
+                targetCtx.fillRect(0, 0, W, H);
+            } else {
+                // Ak TV.jpeg nie je k dispozícii, ponecháme pôvodnú farbu/grafiku antukového podkladu
+                const bgGrad = targetCtx.createLinearGradient(0, 0, 0, H);
+                bgGrad.addColorStop(0, "#5c2010");
+                bgGrad.addColorStop(0.35, "#9a3b1c");
+                bgGrad.addColorStop(1, "#692511");
+                targetCtx.fillStyle = bgGrad;
+                targetCtx.fillRect(0, 0, W, H);
+
+                targetCtx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+                targetCtx.lineWidth = 4;
+                targetCtx.beginPath();
+                targetCtx.moveTo(144, H * 0.68);
+                targetCtx.lineTo(W - 144, H * 0.68);
+                targetCtx.moveTo(312, H * 0.30);
+                targetCtx.lineTo(96, H * 0.92);
+                targetCtx.moveTo(W - 312, H * 0.30);
+                targetCtx.lineTo(W - 96, H * 0.92);
+                targetCtx.moveTo(W / 2, H * 0.30);
+                targetCtx.lineTo(W / 2, H * 0.68);
+                targetCtx.stroke();
+
+                const radGrad = targetCtx.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, W * 0.65);
+                radGrad.addColorStop(0, "rgba(9, 14, 26, 0.15)");
+                radGrad.addColorStop(1, "rgba(9, 14, 26, 0.78)");
+                targetCtx.fillStyle = radGrad;
+                targetCtx.fillRect(0, 0, W, H);
+            }
         }
 
         function openTvModal() {
             document.getElementById("tv-modal").classList.add("open");
             renderTvCanvas();
+            ensureTvBackgroundLoaded(() => {
+                if (document.getElementById("tv-modal").classList.contains("open")) {
+                    renderTvCanvas();
+                }
+            });
         }
 
         function closeTvModal() {
             document.getElementById("tv-modal").classList.remove("open");
         }
 
-        function renderTvCanvas() {
-            const canvas = document.getElementById("tvCanvas");
+        function renderTvCanvas(targetCanvas = null, forceFallbackBg = false) {
+            const canvas = targetCanvas || document.getElementById("tvCanvas");
             const ctx = canvas.getContext("2d");
-            const W = canvas.width;
-            const H = canvas.height;
+            const W = canvas.width;   // 1920 (FullHD)
+            const H = canvas.height;  // 1080 (FullHD)
 
-            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-            bgGrad.addColorStop(0, "#5c2010");
-            bgGrad.addColorStop(0.35, "#9a3b1c");
-            bgGrad.addColorStop(1, "#692511");
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, W, H);
+            ctx.clearRect(0, 0, W, H);
 
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(120, H * 0.68);
-            ctx.lineTo(W - 120, H * 0.68);
-            ctx.moveTo(260, H * 0.30);
-            ctx.lineTo(80, H * 0.92);
-            ctx.moveTo(W - 260, H * 0.30);
-            ctx.lineTo(W - 80, H * 0.92);
-            ctx.moveTo(W / 2, H * 0.30);
-            ctx.lineTo(W / 2, H * 0.68);
+            // 1. Vykreslenie hlavného pozadia (TV.jpeg alebo pôvodný antukový podklad)
+            drawTvBackgroundLayer(ctx, W, H, forceFallbackBg);
+
+            // 2. Rozmery polopriehľadného glass panelu s kompletnou tabuľkou
+            const totalPlayers = Math.max(computedPlayers.length, 1);
+            const panelX = 96;
+            const panelW = W - 192; // 1728
+            const panelY = 64;
+            const panelH = H - 128; // 952
+            const panelRadius = 28;
+
+            // 3. Jemný blur efekt pozadia priamo pod glass panelom
+            ctx.save();
+            drawRoundedRectPath(ctx, panelX, panelY, panelW, panelH, panelRadius);
+            ctx.clip();
+            ctx.filter = "blur(14px)";
+            drawTvBackgroundLayer(ctx, W, H, forceFallbackBg);
+            ctx.filter = "none";
+
+            // Polopriehľadná sklenená výplň (glassmorphism)
+            const glassGrad = ctx.createLinearGradient(panelX, panelY, panelX + panelW, panelY + panelH);
+            glassGrad.addColorStop(0, "rgba(6, 38, 34, 0.62)");
+            glassGrad.addColorStop(0.5, "rgba(4, 28, 25, 0.54)");
+            glassGrad.addColorStop(1, "rgba(2, 20, 18, 0.66)");
+            ctx.fillStyle = glassGrad;
+            ctx.fillRect(panelX, panelY, panelW, panelH);
+
+            // Jemný horný odlesk skla
+            const shineGrad = ctx.createLinearGradient(panelX, panelY, panelX, panelY + 180);
+            shineGrad.addColorStop(0, "rgba(255, 255, 255, 0.14)");
+            shineGrad.addColorStop(1, "rgba(255, 255, 255, 0.0)");
+            ctx.fillStyle = shineGrad;
+            ctx.fillRect(panelX, panelY, panelW, 180);
+            ctx.restore();
+
+            // Vonkajšie orámovanie glass panelu
+            ctx.save();
+            drawRoundedRectPath(ctx, panelX, panelY, panelW, panelH, panelRadius);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.34)";
+            ctx.lineWidth = 2;
             ctx.stroke();
+            ctx.restore();
 
-            const radGrad = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, W*0.65);
-            radGrad.addColorStop(0, "rgba(9, 14, 26, 0.15)");
-            radGrad.addColorStop(1, "rgba(9, 14, 26, 0.78)");
-            ctx.fillStyle = radGrad;
-            ctx.fillRect(0, 0, W, H);
+            // 4. Hlavička vnútri glass panelu
+            const innerX = panelX + 38; // 134
+            const innerW = panelW - 76; // 1652
+            const topY = panelY + 32;
+            const headerBarH = 74;
 
-            const tableX = 80;
-            const tableW = W - 160;
-            const topY = 95;
+            ctx.save();
+            drawRoundedRectPath(ctx, innerX, topY, innerW, headerBarH, 16);
+            ctx.fillStyle = "rgba(0, 26, 22, 0.62)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
 
-            ctx.fillStyle = "rgba(15, 23, 42, 0.92)";
-            ctx.fillRect(tableX, topY, tableW, 64);
-            ctx.fillStyle = "#f97316";
-            ctx.fillRect(tableX, topY, 10, 64);
+            // Červený akcentový pásik na ľavej strane hlavičky
+            ctx.save();
+            drawRoundedRectPath(ctx, innerX, topY, 12, headerBarH, 6);
+            ctx.fillStyle = "#ff6b6b";
+            ctx.fill();
+            ctx.restore();
 
             ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 28px sans-serif";
+            ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.26 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V1.27 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
-            ctx.font = "bold 20px sans-serif";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
+            ctx.font = "700 22px sans-serif";
             ctx.textAlign = "right";
             const todayStr = new Date().toLocaleDateString("sk-SK");
-            ctx.fillText(`AKTUALIZÁCIA: ${todayStr}`, tableX + tableW - 24, topY + 41);
+            ctx.fillText(`ZÁPASOV: ${computedMatches.length} · AKTUALIZÁCIA: ${todayStr}`, innerX + innerW - 26, topY + 46);
 
-            const headY = topY + 76;
-            const headH = 54;
-            ctx.fillStyle = "rgba(30, 41, 59, 0.95)";
-            ctx.fillRect(tableX, headY, tableW, headH);
+            // 5. Hlavička stĺpcov tabuľky (šírka innerW = 1652 px, stĺpec ÚSPEŠNOSŤ (%) zarovnaný bezpečne do poľa)
+            const headY = topY + headerBarH + 18;
+            const headH = 56;
+
+            ctx.save();
+            drawRoundedRectPath(ctx, innerX, headY, innerW, headH, 12);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.20)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
 
             const cols = [
-                { label: "POR", x: tableX + 50, align: "center" },
-                { label: "MENO", x: tableX + 130, align: "left" },
-                { label: "ELO", x: tableX + 530, align: "center" },
-                { label: "ZÁPASY", x: tableX + 710, align: "center" },
-                { label: "VÝHRY", x: tableX + 870, align: "center" },
-                { label: "PREHRY", x: tableX + 1030, align: "center" },
-                { label: "REMÍZY", x: tableX + 1185, align: "center" },
-                { label: "ÚSPEŠNOSŤ (%)", x: tableX + 1345, align: "center" }
+                { label: "POR.",           x: innerX + 60,   align: "center" },
+                { label: "MENO HRÁČA",     x: innerX + 140,  align: "left"   },
+                { label: "ELO",            x: innerX + 605,  align: "center" },
+                { label: "ZÁPASY",         x: innerX + 815,  align: "center" },
+                { label: "VÝHRY",          x: innerX + 985,  align: "center" },
+                { label: "PREHRY",         x: innerX + 1155, align: "center" },
+                { label: "REMÍZY",         x: innerX + 1325, align: "center" },
+                { label: "ÚSPEŠNOSŤ (%)",  x: innerX + 1515, align: "center" }
             ];
 
-            ctx.fillStyle = "#cbd5e1";
-            ctx.font = "bold 20px sans-serif";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.font = "800 20px sans-serif";
             cols.forEach(c => {
                 ctx.textAlign = c.align;
                 ctx.fillText(c.label, c.x, headY + 35);
             });
 
-            const maxRows = Math.min(computedPlayers.length, 8);
-            const rowH = Math.min(82, Math.floor((H - headY - headH - 80) / maxRows));
+            // 6. Riadky kompletnej tabuľky (všetci hráči v databáze)
+            const rowsStartY = headY + headH + 14;
+            const availableRowsH = (panelY + panelH - 32) - rowsStartY;
+            const rowGap = totalPlayers > 8 ? 8 : 12;
+            const rowH = Math.min(92, Math.max(44, Math.floor((availableRowsH - (totalPlayers - 1) * rowGap) / totalPlayers)));
+            const fontSize = Math.min(34, Math.max(20, Math.floor(rowH * 0.42)));
 
-            computedPlayers.slice(0, maxRows).forEach((p, i) => {
-                const ry = headY + headH + i * (rowH + 6) + 6;
-                ctx.fillStyle = i % 2 === 0 ? "rgba(226, 232, 240, 0.92)" : "rgba(203, 213, 225, 0.90)";
-                ctx.fillRect(tableX, ry, tableW, rowH);
+            computedPlayers.forEach((p, i) => {
+                const ry = rowsStartY + i * (rowH + rowGap);
 
-                ctx.fillStyle = "rgba(186, 230, 253, 0.65)";
-                ctx.fillRect(tableX + 440, ry, 180, rowH);
+                // Polopriehľadný glass riadok hráča
+                ctx.save();
+                drawRoundedRectPath(ctx, innerX, ry, innerW, rowH, 14);
+                ctx.fillStyle = i % 2 === 0
+                    ? "rgba(255, 255, 255, 0.13)"
+                    : "rgba(255, 255, 255, 0.07)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
 
-                const winPct = p.matches > 0 ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1) : "0.0";
-                const textY = ry + rowH / 2 + 11;
+                // Zvýraznený glass stĺpec pre ELO hodnotu (vycentrovaný okolo cols[2].x = innerX + 605)
+                ctx.save();
+                drawRoundedRectPath(ctx, innerX + 505, ry + 4, 200, rowH - 8, 10);
+                ctx.fillStyle = "rgba(0, 42, 37, 0.48)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(165, 243, 252, 0.30)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
 
-                ctx.fillStyle = "#0f172a";
-                ctx.font = "bold 31px sans-serif";
+                const winPct = p.matches > 0
+                    ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1)
+                    : "0.0";
+                const textY = ry + rowH / 2 + Math.round(fontSize * 0.36);
 
+                // Poradie (badge pre top 3)
+                const rank = i + 1;
+                const badgeSize = Math.min(46, rowH - 14);
+                const badgeX = cols[0].x - badgeSize / 2;
+                const badgeY = ry + (rowH - badgeSize) / 2;
+
+                ctx.save();
+                drawRoundedRectPath(ctx, badgeX, badgeY, badgeSize, badgeSize, 10);
+                if (rank === 1) {
+                    ctx.fillStyle = "#facc15";
+                } else if (rank === 2) {
+                    ctx.fillStyle = "#e2e8f0";
+                } else if (rank === 3) {
+                    ctx.fillStyle = "#fb923c";
+                } else {
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.16)";
+                }
+                ctx.fill();
+                ctx.restore();
+
+                ctx.font = `800 ${Math.round(fontSize * 0.85)}px sans-serif`;
                 ctx.textAlign = "center";
-                ctx.fillText(`${i + 1}`, cols[0].x, textY);
+                ctx.fillStyle = (rank === 1 || rank === 2) ? "#090e1a" : "#ffffff";
+                ctx.fillText(`${rank}`, cols[0].x, textY - 2);
 
+                // Farebná bodka hráča + Meno (s ohraničením maxWidth, aby nezasahovalo do stĺpca ELO)
+                const dotR = Math.max(6, Math.round(fontSize * 0.22));
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(cols[1].x + dotR, ry + rowH / 2, dotR, 0, Math.PI * 2);
+                ctx.fillStyle = p.color || "#ffffff";
+                ctx.fill();
+                ctx.restore();
+
+                ctx.font = `800 ${fontSize}px sans-serif`;
                 ctx.textAlign = "left";
-                ctx.fillText(p.name.toUpperCase(), cols[1].x, textY);
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(p.name.toUpperCase(), cols[1].x + dotR * 2 + 14, textY, 330);
 
+                // ELO
                 ctx.textAlign = "center";
-                ctx.fillStyle = "#0369a1";
+                ctx.fillStyle = "#a5f3fc";
+                ctx.font = `800 ${fontSize}px sans-serif`;
                 ctx.fillText(p.elo.toFixed(1), cols[2].x, textY);
 
-                ctx.fillStyle = "#0f172a";
+                // Zápasy
+                ctx.fillStyle = "#ffffff";
+                ctx.font = `700 ${fontSize}px sans-serif`;
                 ctx.fillText(`${p.matches}`, cols[3].x, textY);
+
+                // Výhry
+                ctx.fillStyle = "#6ee7b7";
+                ctx.font = `800 ${fontSize}px sans-serif`;
                 ctx.fillText(`${p.wins}`, cols[4].x, textY);
+
+                // Prehry
+                ctx.fillStyle = "#fca5a5";
+                ctx.font = `700 ${fontSize}px sans-serif`;
                 ctx.fillText(`${p.losses}`, cols[5].x, textY);
+
+                // Remízy
+                ctx.fillStyle = "#fde047";
+                ctx.font = `700 ${fontSize}px sans-serif`;
                 ctx.fillText(`${p.draws}`, cols[6].x, textY);
-                ctx.fillText(`${winPct}%`, cols[7].x, textY);
+
+                // Úspešnosť (%) – vycentrovaná pod nadpisom ÚSPEŠNOSŤ (%) s rezervou od pravého okraja
+                ctx.fillStyle = "#ffffff";
+                ctx.font = `800 ${fontSize}px sans-serif`;
+                ctx.fillText(`${winPct}%`, cols[7].x, textY, 210);
             });
+        }
+
+        function triggerBlobDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (a.parentNode) a.parentNode.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 4000);
         }
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const a = document.createElement("a");
-            a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V1.26_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
-            a.click();
+            const filename = `ELO2MASTER_V1.27_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+
+            try {
+                // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        triggerBlobDownload(blob, filename);
+                        showToast("FullHD PNG grafika bola stiahnutá!");
+                    } else {
+                        exportFallbackUntaintedCanvas(filename);
+                    }
+                }, "image/png");
+            } catch (err) {
+                // Ak prehliadač v lokálnom režime (file://) zablokoval čítanie lokálneho TV.jpeg (SecurityError)
+                exportFallbackUntaintedCanvas(filename);
+            }
+        }
+
+        function exportFallbackUntaintedCanvas(filename) {
+            try {
+                const offCanvas = document.createElement("canvas");
+                offCanvas.width = 1920;
+                offCanvas.height = 1080;
+                renderTvCanvas(offCanvas, true);
+                offCanvas.toBlob(blob => {
+                    if (blob) {
+                        triggerBlobDownload(blob, filename);
+                        showToast("Grafika stiahnutá (v režime file:// bez externého obrázka, na GitHube sa stiahne aj s TV.jpeg).");
+                    }
+                }, "image/png");
+            } catch (e) {
+                showToast("Nepodarilo sa vygenerovať PNG súbor.", true);
+            }
         }
 
         function switchTab(secId, btnEl) {
