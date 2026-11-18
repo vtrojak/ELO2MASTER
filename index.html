@@ -1021,7 +1021,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.23</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.24</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1227,19 +1227,19 @@
         <!-- SEKCIA 5: HISTÓRIA ZÁPASOV, DODATOČNÝ ZÁPIS & PREPOČET OD 1500 -->
         <section id="sec-history" class="section">
 
-            <!-- KARTA 1: INFO O REŽIME -->
+            <!-- KARTA 1: INFO O REŽIME & GITHUB SYNC -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 1.23)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.24)
                     </div>
-                    <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
+                    <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
 
                 <div class="mode-box">
-                    <div style="font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; color: var(--tennis-lime);">Nová kompletná história 55 zápasov</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Všetci hráči začínajú na štarte s hodnotou 1500.0 ELO a tabuľka sa rátala chronologicky cez všetkých 55 zápasov od prvého po posledný.</div>
+                    <div id="sync-status-title" style="font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; color: var(--tennis-lime);">Automatická synchronizácia (databaza.json)</div>
+                    <div id="sync-status-desc" style="font-size: 0.78rem; color: var(--text-muted);">Pri načítaní stránky aplikácia automaticky hľadá súbor <strong>databaza.json</strong> v rovnakom priečinku na GitHube. Ak je novší ako lokálne dáta, načíta ho všetkým návštevníkom.</div>
                 </div>
             </div>
 
@@ -1333,10 +1333,18 @@
                     </div>
                 </div>
 
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-primary" onclick="exportBackupJSON('databaza.json')">Stiahnuť databaza.json (pre GitHub)</button>
+                </div>
+
                 <div class="grid-2" style="margin-bottom: 10px;">
-                    <button class="btn btn-secondary" onclick="exportBackupJSON()">Stiahnuť JSON zálohu</button>
-                    <button class="btn btn-secondary" onclick="document.getElementById('import-json-input').click()">Načítať JSON zálohu</button>
+                    <button class="btn btn-secondary" onclick="exportBackupJSON()">Stiahnuť JSON s dátumom</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-json-input').click()">Načítať JSON zo súboru</button>
                     <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importBackupJSON(event)">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary" onclick="syncFromRemoteJSON(true)">↻ Vynútiť načítanie databaza.json z GitHubu</button>
                 </div>
 
                 <div class="grid-2" style="margin-bottom: 10px;">
@@ -1459,6 +1467,7 @@
 
     <script>
         const STORAGE_KEY = "ELO2MASTER_DB_V14";
+        const REMOTE_JSON_FILES = ["databaza.json", "data.json"];
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -1545,7 +1554,8 @@
             config: { K: 32, D: 200, calcFrom1500: true },
             players: [],
             matches: [],
-            chartVisiblePlayers: {}
+            chartVisiblePlayers: {},
+            updatedAt: 0
         };
 
         let computedPlayers = [];
@@ -1554,23 +1564,7 @@
         let timelinePoints = []; 
         let interactiveHitPoints = [];
 
-        function initApp() {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    state.config = { K: 32, D: 200, calcFrom1500: true, ...(parsed.config || {}) };
-                    state.players = parsed.players || JSON.parse(JSON.stringify(INITIAL_PLAYERS));
-                    state.matches = parsed.matches || JSON.parse(JSON.stringify(INITIAL_MATCHES));
-                    state.chartVisiblePlayers = parsed.chartVisiblePlayers || {};
-                } catch (e) {
-                    loadDefaults();
-                }
-            } else {
-                loadDefaults();
-            }
-
-            // Ensure all INITIAL_PLAYERS are present
+        function normalizeStatePlayers() {
             INITIAL_PLAYERS.forEach(ip => {
                 if (!state.players.some(p => p.id === ip.id)) {
                     state.players.push(JSON.parse(JSON.stringify(ip)));
@@ -1583,6 +1577,134 @@
                     state.chartVisiblePlayers[p.id] = true;
                 }
             });
+        }
+
+        function updateSyncBanner(mode, detailText) {
+            const pill = document.getElementById("sync-status-pill");
+            const title = document.getElementById("sync-status-title");
+            const desc = document.getElementById("sync-status-desc");
+            if (!pill || !title || !desc) return;
+
+            if (mode === "remote") {
+                pill.textContent = "GitHub Sync ✓";
+                pill.style.background = "rgba(110, 231, 183, 0.18)";
+                pill.style.color = "var(--win)";
+                pill.style.borderColor = "rgba(110, 231, 183, 0.45)";
+                title.textContent = "Načítané dáta zo servera (databaza.json)";
+                title.style.color = "var(--win)";
+                desc.innerHTML = detailText;
+            } else if (mode === "local") {
+                pill.textContent = "Lokálna pamäť";
+                pill.style.background = "rgba(125, 211, 252, 0.18)";
+                pill.style.color = "var(--blue-accent)";
+                pill.style.borderColor = "rgba(125, 211, 252, 0.45)";
+                title.textContent = "Používajú sa novšie lokálne dáta v prehliadači";
+                title.style.color = "var(--blue-accent)";
+                desc.innerHTML = detailText;
+            } else {
+                pill.textContent = "Vstavané dáta";
+                pill.style.background = "rgba(163, 230, 53, 0.15)";
+                pill.style.color = "var(--tennis-lime)";
+                pill.style.borderColor = "rgba(163, 230, 53, 0.35)";
+                title.textContent = `História ${state.matches.length} zápasov (lokálny režim)`;
+                title.style.color = "var(--tennis-lime)";
+                desc.innerHTML = detailText;
+            }
+        }
+
+        async function syncFromRemoteJSON(forceOverwrite = false) {
+            let remoteData = null;
+            let loadedFileName = "";
+
+            for (const fileName of REMOTE_JSON_FILES) {
+                try {
+                    const response = await fetch(`./${fileName}?t=${Date.now()}`, { cache: "no-store" });
+                    if (response.ok) {
+                        const parsed = await response.json();
+                        if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.matches)) {
+                            remoteData = parsed;
+                            loadedFileName = fileName;
+                            break;
+                        }
+                    }
+                } catch (err) {
+                    // Continue to next candidate or fallback silently when offline / file://
+                }
+            }
+
+            if (!remoteData) {
+                if (forceOverwrite) {
+                    showToast("Súbor databaza.json sa na serveri nenašiel (alebo aplikácia beží offline).", true);
+                } else {
+                    updateSyncBanner("default", "Súbor <strong>databaza.json</strong> zatiaľ nebol nájdený vedľa HTML súboru. Používajú sa dáta uložené v prehliadači. Pre zdieľanie výsledkov stiahni <em>databaza.json</em> a nahraj ho na GitHub.");
+                }
+                return false;
+            }
+
+            const remoteMatchesCount = remoteData.matches.length;
+            const localMatchesCount = (state.matches || []).length;
+            const remoteUpdated = Number(remoteData.updatedAt) || 0;
+            const localUpdated = Number(state.updatedAt) || 0;
+
+            let shouldApply = false;
+            if (forceOverwrite) {
+                shouldApply = true;
+            } else if (remoteUpdated > 0 && localUpdated > 0) {
+                shouldApply = remoteUpdated >= localUpdated;
+            } else if (remoteUpdated > 0 && localUpdated === 0) {
+                shouldApply = remoteMatchesCount >= localMatchesCount;
+            } else {
+                shouldApply = remoteMatchesCount >= localMatchesCount;
+            }
+
+            if (shouldApply) {
+                const preservedCharts = state.chartVisiblePlayers || {};
+                state = {
+                    config: { K: 32, D: 200, calcFrom1500: true, ...(remoteData.config || {}) },
+                    players: remoteData.players,
+                    matches: remoteData.matches,
+                    chartVisiblePlayers: { ...(remoteData.chartVisiblePlayers || {}), ...preservedCharts },
+                    updatedAt: remoteUpdated || Date.now()
+                };
+                normalizeStatePlayers();
+                document.getElementById("cfg-k").value = state.config.K;
+                document.getElementById("cfg-d").value = state.config.D;
+                sortMatchesChronologically();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                recalculateAll();
+                populateSelects();
+                refreshAllViews();
+
+                const syncTimeStr = remoteUpdated ? new Date(remoteUpdated).toLocaleString("sk-SK") : "bez časovej pečiatky";
+                updateSyncBanner("remote", `Úspešne synchronizované zo súboru <strong>${loadedFileName}</strong> (${state.matches.length} zápasov · verzia zálohy: ${syncTimeStr}).`);
+                if (forceOverwrite) {
+                    showToast(`Dáta zo súboru ${loadedFileName} (${state.matches.length} zápasov) boli načítané!`);
+                }
+                return true;
+            } else {
+                updateSyncBanner("local", `V tvojom prehliadači sú novšie zmeny (${localMatchesCount} zápasov) než na GitHube v <strong>${loadedFileName}</strong> (${remoteMatchesCount} zápasov). Pre zverejnenie stiahni <em>databaza.json</em> a nahraj ho na GitHub.`);
+                return false;
+            }
+        }
+
+        async function initApp() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    state.config = { K: 32, D: 200, calcFrom1500: true, ...(parsed.config || {}) };
+                    state.players = parsed.players || JSON.parse(JSON.stringify(INITIAL_PLAYERS));
+                    state.matches = parsed.matches || JSON.parse(JSON.stringify(INITIAL_MATCHES));
+                    state.chartVisiblePlayers = parsed.chartVisiblePlayers || {};
+                    state.updatedAt = Number(parsed.updatedAt) || 0;
+                } catch (e) {
+                    loadDefaults();
+                }
+            } else {
+                loadDefaults();
+            }
+
+            normalizeStatePlayers();
 
             const todayIso = new Date().toISOString().split("T")[0];
             document.getElementById("match-date").value = todayIso;
@@ -1595,6 +1717,9 @@
             populateSelects();
             refreshAllViews();
             setupCanvasEvents();
+
+            // Automaticky skontrolovať externý databaza.json na GitHube
+            await syncFromRemoteJSON(false);
         }
 
         function loadDefaults() {
@@ -1602,14 +1727,16 @@
             state.players = JSON.parse(JSON.stringify(INITIAL_PLAYERS));
             state.matches = JSON.parse(JSON.stringify(INITIAL_MATCHES));
             state.chartVisiblePlayers = {};
+            state.updatedAt = 0;
             state.players.forEach((p, idx) => {
                 p.color = PLAYER_COLORS[idx % PLAYER_COLORS.length];
                 state.chartVisiblePlayers[p.id] = true;
             });
-            saveState();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
         function saveState() {
+            state.updatedAt = Date.now();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
@@ -3224,12 +3351,21 @@
             showToast("Dáta boli obnovené na novú predvolenú históriu 55 zápasov!");
         }
 
-        function exportBackupJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+        function exportBackupJSON(customFilename = null) {
+            if (!state.updatedAt) state.updatedAt = Date.now();
+            const exportPayload = {
+                ...state,
+                updatedAt: state.updatedAt,
+                exportedAtIso: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v1.23_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = customFilename || `ELO2MASTER_v1.24_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
+            if (customFilename === "databaza.json") {
+                showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
+            }
         }
 
         function importBackupJSON(ev) {
@@ -3244,8 +3380,10 @@
                             config: { K: 32, D: 200, calcFrom1500: true, ...(imported.config || {}) },
                             players: imported.players,
                             matches: imported.matches || [],
-                            chartVisiblePlayers: imported.chartVisiblePlayers || {}
+                            chartVisiblePlayers: imported.chartVisiblePlayers || {},
+                            updatedAt: Date.now()
                         };
+                        normalizeStatePlayers();
                         sortMatchesChronologically();
                         saveState();
                         recalculateAll();
@@ -3258,6 +3396,7 @@
                 } catch (err) {
                     showToast("Chyba pri čítaní súboru!", true);
                 }
+                ev.target.value = "";
             };
             reader.readAsText(file);
         }
@@ -3272,7 +3411,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.23_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.24_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -3329,7 +3468,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.23 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V1.24 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
             ctx.font = "bold 20px sans-serif";
@@ -3400,7 +3539,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V1.23_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V1.24_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
