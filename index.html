@@ -1167,7 +1167,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.27</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.28</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1191,8 +1191,9 @@
             </button>
             <div class="stat-tile" id="last-match-banner" style="margin-bottom: 14px; padding: 12px 16px;">
                 <div class="stat-tile-label" id="last-match-label">Posledný odohratý zápas</div>
-                <div class="stat-tile-value" id="last-match-result" style="margin-top: 4px; font-size: 1.04rem;">—</div>
-                <div class="stat-tile-sub" id="last-match-meta" style="margin-top: 3px;">—</div>
+                <div class="stat-tile-value" id="last-match-players" style="margin-top: 6px; font-size: 1.04rem;">—</div>
+                <div id="last-match-score" style="margin-top: 6px; font-size: 0.96rem;">—</div>
+                <div class="stat-tile-sub" id="last-match-meta" style="margin-top: 6px;">—</div>
             </div>
 
             <div class="card">
@@ -1382,7 +1383,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.27)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.28)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1505,7 +1506,7 @@
                                 <span><i class="fa-solid fa-file-shield"></i> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.27_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.28_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -2660,7 +2661,8 @@
             tbody.innerHTML = "";
 
             const lmLabel = document.getElementById("last-match-label");
-            const lmResult = document.getElementById("last-match-result");
+            const lmPlayers = document.getElementById("last-match-players");
+            const lmScore = document.getElementById("last-match-score");
             const lmMeta = document.getElementById("last-match-meta");
 
             if (computedMatches.length > 0) {
@@ -2669,11 +2671,13 @@
                 const signA = lastM.deltaA >= 0 ? `+${lastM.deltaA.toFixed(1)}` : lastM.deltaA.toFixed(1);
                 const signB = lastM.deltaB >= 0 ? `+${lastM.deltaB.toFixed(1)}` : lastM.deltaB.toFixed(1);
                 lmLabel.textContent = `Posledný odohratý zápas (#${lastM.index}) · ${lastM.date}`;
-                lmResult.innerHTML = `${lastM.nameA} <span style="color:var(--text-muted); font-weight:500;">vs</span> ${lastM.nameB} <span class="match-score-pill" style="font-size:0.92rem;">${lastM.sets1}:${lastM.sets2}</span> <span style="color:var(--text-muted); font-weight:600; font-size:0.88rem;">${gemsText}</span>`;
+                lmPlayers.innerHTML = `${lastM.nameA} <span style="color:var(--text-muted); font-weight:500;">vs</span> ${lastM.nameB}`;
+                lmScore.innerHTML = `<span class="match-score-pill" style="font-size:0.96rem; margin-left:0;">${lastM.sets1}:${lastM.sets2}</span> <span style="color:var(--text-muted); font-weight:600; font-size:0.9rem;">${gemsText}</span>`;
                 lmMeta.textContent = `Posun ELO: ${lastM.nameA} (${signA}) · ${lastM.nameB} (${signB})`;
             } else {
                 lmLabel.textContent = "Posledný odohratý zápas";
-                lmResult.textContent = "Zatiaľ žiadny odohratý zápas";
+                lmPlayers.textContent = "Zatiaľ žiadny odohratý zápas";
+                lmScore.textContent = "—";
                 lmMeta.textContent = "Pridaj prvý zápas v sekcii Nový zápas";
             }
 
@@ -3599,7 +3603,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = customFilename || `ELO2MASTER_v1.27_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = customFilename || `ELO2MASTER_v1.28_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -3649,7 +3653,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.27_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.28_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -3869,7 +3873,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.27 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
+            ctx.fillText("ELO2MASTER V1.28 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
             ctx.font = "700 22px sans-serif";
@@ -4033,7 +4037,7 @@
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const filename = `ELO2MASTER_V1.27_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.28_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
 
             try {
                 // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
