@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>ELO2MASTER | Tenisový ELO Systém & Štatistiky</title>
     <style>
         :root {
@@ -808,19 +809,40 @@
         .ach-card.ach-teal { border-color: rgba(45, 212, 191, 0.35); }
 
         .ach-emblem {
-            width: 58px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.48));
+        }
+
+        .hex-outer {
+            width: 54px;
+            height: 54px;
+            clip-path: polygon(50% 3%, 93% 26%, 93% 74%, 50% 97%, 7% 74%, 7% 26%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5px;
+        }
+
+        .hex-inner {
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 3%, 93% 26%, 93% 74%, 50% 97%, 7% 74%, 7% 26%);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
         }
 
-        .ach-emblem svg {
-            width: 100%;
-            height: 100%;
-            overflow: visible;
+        .hex-inner i {
+            font-size: 1.28rem;
+            line-height: 1;
+            display: inline-block;
         }
 
         .ach-body {
@@ -920,7 +942,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.16</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.18</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -938,22 +960,10 @@
     <main class="container">
         <!-- SEKCIA 1: TABUĽKA -->
         <section id="sec-table" class="section active">
-            <div class="summary-grid">
-                <div class="stat-tile">
-                    <div class="stat-tile-label">Líder rebríčka</div>
-                    <div class="stat-tile-value" id="sum-leader-name">Vlado</div>
-                    <div class="stat-tile-sub" id="sum-leader-elo">1500 ELO</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-tile-label">Hráčov v DB</div>
-                    <div class="stat-tile-value" id="sum-players-count">6</div>
-                    <div class="stat-tile-sub" id="sum-mode-badge">Prepočet od 1500 ELO</div>
-                </div>
-                <div class="stat-tile">
-                    <div class="stat-tile-label">Zápasy v histórii</div>
-                    <div class="stat-tile-value" id="sum-matches-count">55</div>
-                    <div class="stat-tile-sub" id="sum-total-starts">Celkovo štartov</div>
-                </div>
+            <div class="stat-tile" id="last-match-banner" style="margin-bottom: 14px; padding: 12px 16px;">
+                <div class="stat-tile-label" id="last-match-label">Posledný odohratý zápas</div>
+                <div class="stat-tile-value" id="last-match-result" style="margin-top: 4px; font-size: 1.04rem;">—</div>
+                <div class="stat-tile-sub" id="last-match-meta" style="margin-top: 3px;">—</div>
             </div>
 
             <div class="card">
@@ -998,7 +1008,7 @@
                         <input type="text" id="new-player-name" placeholder="napr. Marcel / Adam">
                     </div>
                     <div class="form-group">
-                        <label for="new-player-elo">Počiatočné ELO (default 1500)</label>
+                        <label for="new-player-elo">Počiatočné ELO</label>
                         <input type="number" id="new-player-elo" value="1500" step="0.1">
                     </div>
                 </div>
@@ -1144,7 +1154,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 1.16)
+                        Aktívny režim histórie (Verzia 1.18)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1898,6 +1908,26 @@
             const robinHoodRes = getLeaders("worstLossDonate");
             const unluckyRes = getLeaders("unluckyLosses");
 
+            const getHexBadgeHtml = (faClass, themeKey) => {
+                const palettes = {
+                    "ach-lime":   { bg1: "#1a2e05", bg2: "#090e1a", border: "#a3e635", fg: "#bef264" },
+                    "ach-red":    { bg1: "#450a0a", bg2: "#090e1a", border: "#ef4444", fg: "#f87171" },
+                    "ach-gold":   { bg1: "#451a03", bg2: "#090e1a", border: "#f59e0b", fg: "#fbbf24" },
+                    "ach-clay":   { bg1: "#431407", bg2: "#090e1a", border: "#f97316", fg: "#fb923c" },
+                    "ach-blue":   { bg1: "#082f49", bg2: "#090e1a", border: "#38bdf8", fg: "#7dd3fc" },
+                    "ach-purple": { bg1: "#3b0764", bg2: "#090e1a", border: "#c084fc", fg: "#e879f9" },
+                    "ach-teal":   { bg1: "#042f2e", bg2: "#090e1a", border: "#2dd4bf", fg: "#5eead4" }
+                };
+                const pal = palettes[themeKey] || palettes["ach-gold"];
+                return `
+                    <div class="hex-outer" style="background: ${pal.border};">
+                        <div class="hex-inner" style="background: linear-gradient(145deg, ${pal.bg1}, ${pal.bg2});">
+                            <i class="${faClass}" style="color: ${pal.fg};" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                `;
+            };
+
             const badges = [
                 // 1. Neporaziteľný
                 {
@@ -1913,15 +1943,7 @@
                     subStat: curWinRes.maxVal > 0
                         ? `Aktuálne ťahá: ${curWinRes.holders.map(h => h.name).join(", ")} (${curWinRes.maxVal}V)`
                         : "Aktuálne bez aktívnej šnúry",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(54,83,20,0.45)" stroke="#a3e635" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(163,230,53,0.28)" stroke-width="1"/>
-                            <path d="M32 16c3 6 10 9 10 18a10 10 0 0 1-20 0c0-5 3-9 5-12 0 4 2 5 2 5s-1-6 3-11z" fill="rgba(163,230,53,0.22)" stroke="#a3e635" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="32" cy="37" r="6" fill="none" stroke="#facc15" stroke-width="2"/>
-                            <path d="M28 34c2 2 2 4 0 6M36 34c-2 2-2 4 0 6" stroke="#facc15" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-fire", "ach-lime")
                 },
                 // 2. Voľný pád
                 {
@@ -1935,17 +1957,9 @@
                     mainStatLabel: "Rekordná séria:",
                     mainStatVal: `${lossStreakRes.maxVal} prehier v rade`,
                     subStat: "Najdlhšie čakanie na bodový zápis",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(127,29,29,0.45)" stroke="#ef4444" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(239,68,68,0.28)" stroke-width="1"/>
-                            <circle cx="32" cy="30" r="9" fill="rgba(239,68,68,0.2)" stroke="#f87171" stroke-width="2"/>
-                            <path d="M29 27l3 3-3 3 5 2" stroke="#fca5a5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M32 39v14M26 47l6 6 6-6" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-anchor", "ach-red")
                 },
-                // 3. Kráľ kanárov
+                // 3. Kráľ kanárov (Čistič)
                 {
                     id: "bagels_given",
                     theme: "ach-gold",
@@ -1957,15 +1971,7 @@
                     mainStatLabel: "Rozdané kanáre:",
                     mainStatVal: `${bagelsGivenRes.maxVal}× set 6:0`,
                     subStat: "Absolútna dominancia v sete bez straty gemu",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(120,53,15,0.45)" stroke="#f59e0b" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(245,158,11,0.28)" stroke-width="1"/>
-                            <circle cx="32" cy="36" r="12" fill="rgba(245,158,11,0.2)" stroke="#fbbf24" stroke-width="2.4"/>
-                            <circle cx="32" cy="36" r="4.5" fill="#090e1a" stroke="#f59e0b" stroke-width="2"/>
-                            <path d="M23 22l4 3 5-5 5 5 4-3" stroke="#fde047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-broom", "ach-gold")
                 },
                 // 4. Kŕmič vtáčkov
                 {
@@ -1979,16 +1985,7 @@
                     mainStatLabel: "Inkasované kanáre:",
                     mainStatVal: `${bagelsRecRes.maxVal}× set 0:6`,
                     subStat: "Keď sa v sete nepodarí uchmatnúť ani gem",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(124,45,18,0.45)" stroke="#f97316" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(249,115,22,0.28)" stroke-width="1"/>
-                            <path d="M22 48h20M24 48V32a8 8 0 0 1 16 0v16" fill="rgba(249,115,22,0.16)" stroke="#fb923c" stroke-width="2" stroke-linecap="round"/>
-                            <line x1="29" y1="25" x2="29" y2="48" stroke="#f97316" stroke-width="1.6"/>
-                            <line x1="35" y1="25" x2="35" y2="48" stroke="#f97316" stroke-width="1.6"/>
-                            <circle cx="32" cy="20" r="2.5" stroke="#fdba74" stroke-width="1.8"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-crow", "ach-clay")
                 },
                 // 5. Tiebreakový špecialista
                 {
@@ -2004,15 +2001,7 @@
                     subStat: tbPlayedRes.holders.length > 0
                         ? `Bilancia lídra v TB: ${tbPlayedRes.holders.map(h => `${h.name} (${h.tiebreaksWon}V / ${h.tiebreaksPlayed - h.tiebreaksWon}P)`).join(", ")}`
                         : "Zatiaľ bez tiebreaku",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(12,74,110,0.45)" stroke="#38bdf8" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(56,189,248,0.28)" stroke-width="1"/>
-                            <circle cx="32" cy="38" r="12" fill="rgba(56,189,248,0.16)" stroke="#38bdf8" stroke-width="2"/>
-                            <path d="M29 22h6M32 22v4" stroke="#7dd3fc" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M33 30l-4 7h6l-2 7" stroke="#facc15" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-stopwatch", "ach-blue")
                 },
                 // 6. Zabijak obrov (Giant Slayer)
                 {
@@ -2028,13 +2017,7 @@
                     subStat: giantSlayerRes.holders.length > 0
                         ? giantSlayerRes.holders[0].bestGainDetail
                         : "Zatiaľ bez záznamu",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(88,28,135,0.45)" stroke="#c084fc" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(192,132,252,0.28)" stroke-width="1"/>
-                            <path d="M35 16L20 37h11l-4 19 17-23H33l2-17z" fill="rgba(192,132,252,0.22)" stroke="#e879f9" stroke-width="2" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-bolt", "ach-purple")
                 },
                 // 7. Vrchol potravinového reťazca (Peak Master)
                 {
@@ -2048,16 +2031,9 @@
                     mainStatLabel: "Historický Peak:",
                     mainStatVal: `${peakEloRes.maxVal.toFixed(1)} ELO`,
                     subStat: "Najvyššia zaznamenaná forma na kurte",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(113,63,18,0.45)" stroke="#facc15" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(250,204,21,0.28)" stroke-width="1"/>
-                            <path d="M16 49l11-20 7 11 5-7 9 16H16z" fill="rgba(250,204,21,0.2)" stroke="#fde047" stroke-width="2" stroke-linejoin="round"/>
-                            <path d="M27 29V18l9 4-9 4" fill="#facc15" stroke="#fde047" stroke-width="1.8" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-mountain", "ach-gold")
                 },
-                // 8. Čistič kurtu (Suverén)
+                // 8. Chirurg (Suverén)
                 {
                     id: "clean_sweeps",
                     theme: "ach-lime",
@@ -2069,14 +2045,7 @@
                     mainStatLabel: "Čisté výhry:",
                     mainStatVal: `${cleanSweepsRes.maxVal}× bez straty setu`,
                     subStat: "Stopercentná kontrola od prvej po poslednú loptičku",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(54,83,20,0.45)" stroke="#a3e635" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(163,230,53,0.28)" stroke-width="1"/>
-                            <path d="M32 18l3.8 7.8 8.6 1.2-6.2 6 1.5 8.5L32 37.5l-7.7 4 1.5-8.5-6.2-6 8.6-1.2L32 18z" fill="rgba(163,230,53,0.22)" stroke="#a3e635" stroke-width="2" stroke-linejoin="round"/>
-                            <path d="M20 49h24" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-star", "ach-lime")
                 },
                 // 9. Kráľ obratov (Comeback Kid)
                 {
@@ -2090,15 +2059,7 @@
                     mainStatLabel: "Otočené zápasy:",
                     mainStatVal: `${comebacksRes.maxVal}× obrat z 0:1`,
                     subStat: "Prehratý prvý set je len zahrievacie kolo",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(12,74,110,0.45)" stroke="#38bdf8" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(56,189,248,0.28)" stroke-width="1"/>
-                            <path d="M22 44V30a10 10 0 0 1 20 0v12" stroke="#38bdf8" stroke-width="2.4" stroke-linecap="round"/>
-                            <polyline points="36 37 42 43 48 37" stroke="#facc15" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="22" cy="44" r="3" fill="#38bdf8"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-rotate-left", "ach-blue")
                 },
                 // 10. Maratónec (Železný muž)
                 {
@@ -2112,17 +2073,7 @@
                     mainStatLabel: "Trojsetové zápasy:",
                     mainStatVal: `${marathonRes.maxVal}× plná minutáž`,
                     subStat: "Kondícia pripravená na dlhé výmeny",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(124,45,18,0.45)" stroke="#f97316" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(249,115,22,0.28)" stroke-width="1"/>
-                            <rect x="22" y="22" width="20" height="30" rx="3" fill="rgba(249,115,22,0.15)" stroke="#fb923c" stroke-width="2"/>
-                            <path d="M28 19h8" stroke="#fdba74" stroke-width="2.4" stroke-linecap="round"/>
-                            <rect x="26" y="27" width="12" height="5" rx="1" fill="#a3e635"/>
-                            <rect x="26" y="34.5" width="12" height="5" rx="1" fill="#facc15"/>
-                            <rect x="26" y="42" width="12" height="5" rx="1" fill="#f97316"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-battery-full", "ach-clay")
                 },
                 // 11. Zmierlivý diplomat (Kráľ remíz)
                 {
@@ -2136,16 +2087,9 @@
                     mainStatLabel: "Odohrané remízy:",
                     mainStatVal: `${diplomatRes.maxVal}× stav 1:1`,
                     subStat: "Keď vyhrá priateľstvo alebo vyprší čas kurtu",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(19,78,74,0.45)" stroke="#2dd4bf" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(45,212,191,0.28)" stroke-width="1"/>
-                            <path d="M32 20v28M22 48h20M20 26h24" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M20 26l-4 10h8l-4-10zM44 26l-4 10h8l-4-10z" fill="rgba(45,212,191,0.25)" stroke="#5eead4" stroke-width="1.8" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-scale-balanced", "ach-teal")
                 },
-                // 12. Robin Hood
+                // 12. Jánošík (Robin Hood)
                 {
                     id: "robin_hood",
                     theme: "ach-red",
@@ -2159,16 +2103,7 @@
                     subStat: robinHoodRes.holders.length > 0
                         ? robinHoodRes.holders[0].worstLossDetail
                         : "Zatiaľ bez záznamu",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(136,19,55,0.45)" stroke="#f43f5e" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(244,63,94,0.28)" stroke-width="1"/>
-                            <path d="M24 20c12 6 12 26 0 32" stroke="#fb7185" stroke-width="2.2" stroke-linecap="round"/>
-                            <line x1="24" y1="20" x2="24" y2="52" stroke="rgba(251,113,133,0.5)" stroke-width="1.4"/>
-                            <line x1="18" y1="36" x2="45" y2="36" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>
-                            <polyline points="40 31 46 36 40 41" stroke="#facc15" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-hand-holding-dollar", "ach-red")
                 },
                 // 13. Smoliar dňa (Tesnotka)
                 {
@@ -2184,14 +2119,7 @@
                     subStat: unluckyRes.holders.length > 0
                         ? unluckyRes.holders[0].unluckyLastDetail
                         : "Zatiaľ sa nikomu nestalo",
-                    svg: `
-                        <svg viewBox="0 0 64 72" fill="none">
-                            <polygon points="32,3 60,19 60,53 32,69 4,53 4,19" fill="rgba(112,26,117,0.45)" stroke="#e879f9" stroke-width="2.4"/>
-                            <polygon points="32,8 55,21.5 55,50.5 32,64 9,50.5 9,21.5" fill="none" stroke="rgba(232,121,249,0.28)" stroke-width="1"/>
-                            <path d="M32 50s-13-8.5-13-18a7.5 7.5 0 0 1 13-5 7.5 7.5 0 0 1 13 5c0 9.5-13 18-13 18z" fill="rgba(232,121,249,0.18)" stroke="#f0abfc" stroke-width="2" stroke-linejoin="round"/>
-                            <polyline points="32 27 29 35 34 39 31 49" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    `
+                    iconHtml: getHexBadgeHtml("fa-solid fa-heart-crack", "ach-purple")
                 }
             ];
 
@@ -2207,7 +2135,7 @@
 
                 return `
                     <div class="ach-card ${b.theme}">
-                        <div class="ach-emblem">${b.svg}</div>
+                        <div class="ach-emblem">${b.iconHtml}</div>
                         <div class="ach-body">
                             <span class="ach-cat-tag" style="color:${b.accent}">${b.category}</span>
                             <div class="ach-title">${b.title}</div>
@@ -2239,15 +2167,23 @@
             const tbody = document.querySelector("#leaderboard-table tbody");
             tbody.innerHTML = "";
 
-            if (computedPlayers.length > 0) {
-                document.getElementById("sum-leader-name").textContent = computedPlayers[0].name;
-                document.getElementById("sum-leader-elo").textContent = `${computedPlayers[0].elo.toFixed(1)} ELO`;
-            }
-            document.getElementById("sum-players-count").textContent = computedPlayers.length;
-            document.getElementById("sum-matches-count").textContent = computedMatches.length;
+            const lmLabel = document.getElementById("last-match-label");
+            const lmResult = document.getElementById("last-match-result");
+            const lmMeta = document.getElementById("last-match-meta");
 
-            const totalStarts = computedPlayers.reduce((acc, p) => acc + p.matches, 0);
-            document.getElementById("sum-total-starts").textContent = `Spolu ${totalStarts} štartov`;
+            if (computedMatches.length > 0) {
+                const lastM = computedMatches[computedMatches.length - 1];
+                const gemsText = lastM.gems ? ` (${lastM.gems})` : "";
+                const signA = lastM.deltaA >= 0 ? `+${lastM.deltaA.toFixed(1)}` : lastM.deltaA.toFixed(1);
+                const signB = lastM.deltaB >= 0 ? `+${lastM.deltaB.toFixed(1)}` : lastM.deltaB.toFixed(1);
+                lmLabel.textContent = `Posledný odohratý zápas (#${lastM.index}) · ${lastM.date}`;
+                lmResult.innerHTML = `${lastM.nameA} <span style="color:var(--text-muted); font-weight:500;">vs</span> ${lastM.nameB} <span class="match-score-pill" style="font-size:0.92rem;">${lastM.sets1}:${lastM.sets2}</span> <span style="color:var(--text-muted); font-weight:600; font-size:0.88rem;">${gemsText}</span>`;
+                lmMeta.textContent = `Posun ELO: ${lastM.nameA} (${signA}) · ${lastM.nameB} (${signB})`;
+            } else {
+                lmLabel.textContent = "Posledný odohratý zápas";
+                lmResult.textContent = "Zatiaľ žiadny odohratý zápas";
+                lmMeta.textContent = "Pridaj prvý zápas v sekcii Nový zápas";
+            }
 
             computedPlayers.forEach((p, idx) => {
                 const rank = idx + 1;
@@ -2954,7 +2890,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v1.16_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v1.18_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2998,7 +2934,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.16_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.18_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -3055,7 +2991,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.16 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V1.18 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "#94a3b8";
             ctx.font = "bold 20px sans-serif";
@@ -3126,7 +3062,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V1.16_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V1.18_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
