@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#007263">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>ELO2MASTER | Tenisový ELO Systém & Štatistiky</title>
     <style>
         :root {
-            --bg-dark: #090e1a;
-            --bg-card: #111a2e;
-            --bg-card-alt: #17233d;
-            --bg-input: #0c1425;
-            --clay: #d95326;
-            --clay-light: #f97316;
-            --tennis-lime: #a3e635;
-            --blue-accent: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(148, 163, 184, 0.16);
-            --win: #10b981;
-            --draw: #f59e0b;
-            --loss: #ef4444;
-            --radius: 14px;
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --bg-grad-start: #00b49d;
+            --bg-grad-end: #007263;
+            --bg-dark: #004d43;
+            --bg-card: rgba(0, 42, 37, 0.36);
+            --bg-card-alt: rgba(255, 255, 255, 0.14);
+            --bg-input: rgba(0, 32, 28, 0.44);
+            --clay: #880000;
+            --clay-light: #ff6b6b;
+            --tennis-lime: #bef264;
+            --blue-accent: #7dd3fc;
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.80);
+            --border: rgba(255, 255, 255, 0.26);
+            --win: #6ee7b7;
+            --draw: #fde047;
+            --loss: #fca5a5;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 30, 26, 0.32);
+            --glass-blur: blur(16px) saturate(160%);
+            --btn-glass-bg: linear-gradient(135deg, rgba(136, 0, 0, 0.72), rgba(136, 0, 0, 0.46));
+            --btn-glass-hover: linear-gradient(135deg, rgba(165, 0, 0, 0.88), rgba(136, 0, 0, 0.65));
+            --btn-glass-border: rgba(255, 160, 160, 0.42);
+            --btn-glass-shadow: 0 6px 20px rgba(136, 0, 0, 0.40), inset 0 1px 1px rgba(255, 255, 255, 0.30);
         }
 
         * {
@@ -37,10 +44,11 @@
         }
 
         body {
-            background: radial-gradient(circle at 50% 0%, #172544 0%, var(--bg-dark) 65%);
+            background: linear-gradient(135deg, #00b49d 0%, #007263 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding-bottom: 84px;
+            padding-bottom: 88px;
             line-height: 1.45;
         }
 
@@ -49,10 +57,12 @@
             position: sticky;
             top: 0;
             z-index: 900;
-            background: rgba(9, 14, 26, 0.92);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 75, 65, 0.48);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--border);
             padding: 12px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
         }
 
         .header-inner {
@@ -62,6 +72,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .brand {
@@ -74,13 +85,13 @@
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #d9f99d, #84cc16 70%, #4d7c0f);
+            background: radial-gradient(circle at 30% 30%, #ecfccb, #a3e635 70%, #4d7c0f);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 12px rgba(163, 230, 53, 0.4);
+            box-shadow: 0 0 14px rgba(190, 242, 100, 0.45);
             font-weight: 900;
-            color: #090e1a;
+            color: #052e16;
             font-size: 0.85rem;
             letter-spacing: -0.5px;
         }
@@ -89,14 +100,12 @@
             font-size: 1.15rem;
             font-weight: 800;
             letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #ffffff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         .brand-title span {
-            color: var(--clay-light);
-            -webkit-text-fill-color: var(--clay-light);
+            color: #ff9999;
         }
 
         .brand-sub {
@@ -112,9 +121,11 @@
         }
 
         .param-pill {
-            background: rgba(56, 189, 248, 0.12);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--blue-accent);
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            color: #ffffff;
             font-size: 0.72rem;
             font-weight: 700;
             padding: 5px 9px;
@@ -123,10 +134,12 @@
         }
 
         .tv-btn {
-            background: linear-gradient(135deg, var(--clay), var(--clay-light));
-            color: white;
-            border: none;
-            padding: 6px 11px;
+            background: var(--btn-glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            border: 1px solid var(--btn-glass-border);
+            padding: 6px 12px;
             border-radius: 999px;
             font-size: 0.75rem;
             font-weight: 700;
@@ -134,7 +147,12 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            box-shadow: 0 2px 10px rgba(217, 83, 38, 0.4);
+            box-shadow: var(--btn-glass-shadow);
+            transition: all 0.18s ease;
+        }
+
+        .tv-btn:hover {
+            background: var(--btn-glass-hover);
         }
 
         /* MAIN CONTAINER */
@@ -158,14 +176,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* CARDS */
+        /* GLASS CARDS */
         .card {
             background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 16px;
             margin-bottom: 14px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow), inset 0 1px 1px rgba(255, 255, 255, 0.22);
         }
 
         .card-header {
@@ -186,13 +206,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         }
 
         .card-title-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--clay-light);
+            background: #ff6b6b;
+            box-shadow: 0 0 8px rgba(255, 107, 107, 0.8);
             display: inline-block;
         }
 
@@ -206,10 +228,13 @@
 
         .stat-tile {
             background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 10px 12px;
             text-align: center;
+            box-shadow: var(--shadow), inset 0 1px 1px rgba(255, 255, 255, 0.20);
         }
 
         .stat-tile-label {
@@ -228,8 +253,8 @@
 
         .stat-tile-sub {
             font-size: 0.7rem;
-            color: var(--clay-light);
-            font-weight: 600;
+            color: #ff9999;
+            font-weight: 700;
         }
 
         /* TABLE */
@@ -258,7 +283,7 @@
 
         table.elo-table td {
             padding: 11px 6px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             white-space: nowrap;
         }
 
@@ -272,7 +297,7 @@
         }
 
         table.elo-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.10);
         }
 
         .rank-badge {
@@ -284,30 +309,31 @@
             border-radius: 7px;
             font-weight: 800;
             font-size: 0.76rem;
-            background: rgba(148, 163, 184, 0.12);
-            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
         }
 
         .rank-1 {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+            background: linear-gradient(135deg, #facc15, #eab308);
             color: #090e1a;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.5);
         }
 
         .rank-2 {
-            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
             color: #090e1a;
         }
 
         .rank-3 {
-            background: linear-gradient(135deg, #d97706, #92400e);
+            background: linear-gradient(135deg, #fb923c, #c2410c);
             color: #ffffff;
         }
 
         .elo-pill {
             font-weight: 800;
             font-size: 0.92rem;
-            color: var(--blue-accent);
+            color: #a5f3fc;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
         }
 
         .delta-tag {
@@ -338,9 +364,9 @@
             color: #090e1a;
         }
 
-        .form-W { background: var(--win); color: #052e16; }
-        .form-D { background: var(--draw); color: #451a03; }
-        .form-L { background: var(--loss); color: #450a0a; }
+        .form-W { background: #34d399; color: #022c22; }
+        .form-D { background: #facc15; color: #422006; }
+        .form-L { background: #f87171; color: #450a0a; }
 
         .text-right { text-align: right !important; }
         .text-center { text-align: center !important; }
@@ -362,16 +388,28 @@
             width: 100%;
             padding: 11px 12px;
             background: var(--bg-input);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border);
             border-radius: 10px;
             color: var(--text-main);
             font-size: 0.92rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select option {
+            background: #004d43;
+            color: #ffffff;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
         }
 
         input:focus, select:focus {
-            border-color: var(--clay-light);
+            border-color: rgba(255, 255, 255, 0.65);
+            box-shadow: 0 0 0 2px rgba(136, 0, 0, 0.35);
         }
 
         .grid-2 {
@@ -393,88 +431,87 @@
             margin-top: 6px;
         }
 
+        /* BUTTONS: #880000 GLASS EFFECT */
         .preset-btn {
             flex: 1;
             min-width: 52px;
             padding: 8px 6px;
-            background: var(--bg-card-alt);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-main);
+            background: rgba(136, 0, 0, 0.42);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 160, 160, 0.32);
+            border-radius: 9px;
+            color: #ffffff;
             font-weight: 700;
             font-size: 0.82rem;
             cursor: pointer;
             text-align: center;
-            transition: all 0.15s;
+            transition: all 0.18s ease;
+            box-shadow: 0 3px 10px rgba(136, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.22);
         }
 
         .preset-btn.active, .preset-btn:hover {
-            background: rgba(249, 115, 22, 0.2);
-            border-color: var(--clay-light);
-            color: var(--clay-light);
+            background: linear-gradient(135deg, rgba(165, 0, 0, 0.85), rgba(136, 0, 0, 0.68));
+            border-color: rgba(255, 200, 200, 0.65);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(136, 0, 0, 0.48), inset 0 1px 1px rgba(255, 255, 255, 0.35);
         }
 
         .btn {
             width: 100%;
             padding: 13px 16px;
-            border: none;
-            border-radius: 11px;
+            border-radius: 12px;
             font-weight: 700;
             font-size: 0.92rem;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: transform 0.12s, background 0.2s, box-shadow 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
         .btn:active {
             transform: scale(0.98);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--clay), var(--clay-light));
-            color: white;
-            box-shadow: 0 4px 14px rgba(217, 83, 38, 0.35);
+        .btn-primary, .btn-lime, .btn-secondary, .btn-danger {
+            background: var(--btn-glass-bg);
+            color: #ffffff;
+            border: 1px solid var(--btn-glass-border);
+            box-shadow: var(--btn-glass-shadow);
         }
 
-        .btn-lime {
-            background: linear-gradient(135deg, #65a30d, #84cc16);
-            color: #090e1a;
-            box-shadow: 0 4px 14px rgba(132, 204, 22, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--bg-card-alt);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .btn-primary:hover, .btn-lime:hover, .btn-secondary:hover, .btn-danger:hover {
+            background: var(--btn-glass-hover);
+            border-color: rgba(255, 200, 200, 0.65);
         }
 
         /* LIVE ELO PREVIEW BOX */
         .preview-box {
-            background: linear-gradient(135deg, rgba(23, 35, 61, 0.9), rgba(12, 20, 37, 0.9));
-            border: 1px solid rgba(56, 189, 248, 0.28);
-            border-radius: 12px;
+            background: rgba(0, 32, 28, 0.42);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 14px;
             padding: 12px;
             margin: 12px 0;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18);
         }
 
         .preview-header {
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.6px;
-            color: var(--blue-accent);
+            color: #a5f3fc;
             font-weight: 700;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
         .preview-vs {
@@ -485,9 +522,9 @@
         }
 
         .preview-player {
-            background: rgba(9, 14, 26, 0.55);
+            background: rgba(0, 22, 19, 0.42);
             padding: 8px 10px;
-            border-radius: 9px;
+            border-radius: 10px;
             border: 1px solid var(--border);
         }
 
@@ -521,9 +558,11 @@
             font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-muted);
+            border: 1px solid rgba(255, 160, 160, 0.30);
+            background: rgba(136, 0, 0, 0.34);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: rgba(255, 255, 255, 0.75);
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -531,9 +570,10 @@
         }
 
         .player-chip.active {
-            color: var(--text-main);
-            border-color: rgba(255, 255, 255, 0.35);
-            background: var(--bg-card-alt);
+            color: #ffffff;
+            border-color: rgba(255, 190, 190, 0.65);
+            background: rgba(136, 0, 0, 0.72);
+            box-shadow: 0 2px 10px rgba(136, 0, 0, 0.38);
         }
 
         .chip-dot {
@@ -546,7 +586,9 @@
             position: relative;
             width: 100%;
             height: 320px;
-            background: var(--bg-input);
+            background: rgba(0, 28, 24, 0.48);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 12px;
             border: 1px solid var(--border);
             overflow: hidden;
@@ -560,10 +602,12 @@
 
         /* MATCH ITEMS */
         .match-card {
-            background: var(--bg-input);
+            background: rgba(0, 32, 28, 0.42);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--clay-light);
-            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            border-radius: 11px;
             padding: 11px 12px;
             margin-bottom: 9px;
             display: flex;
@@ -592,8 +636,9 @@
 
         .match-score-pill {
             display: inline-block;
-            background: rgba(249, 115, 22, 0.15);
-            color: var(--clay-light);
+            background: rgba(136, 0, 0, 0.58);
+            border: 1px solid rgba(255, 160, 160, 0.35);
+            color: #ffffff;
             padding: 1px 7px;
             border-radius: 6px;
             font-weight: 800;
@@ -618,40 +663,39 @@
             gap: 5px;
         }
 
-        .icon-btn {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.25);
+        .icon-btn, .icon-btn-alt {
+            background: var(--btn-glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #ffffff;
+            border: 1px solid var(--btn-glass-border);
             border-radius: 8px;
             padding: 6px 9px;
             font-size: 0.75rem;
             cursor: pointer;
             font-weight: 700;
+            box-shadow: 0 3px 10px rgba(136, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+            transition: all 0.15s;
         }
 
-        .icon-btn-alt {
-            background: rgba(148, 163, 184, 0.12);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px 8px;
-            font-size: 0.72rem;
-            cursor: pointer;
-            font-weight: 700;
+        .icon-btn:hover, .icon-btn-alt:hover {
+            background: var(--btn-glass-hover);
         }
 
         /* MODE BANNER */
         .mode-box {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(0, 36, 31, 0.38);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(190, 242, 100, 0.40);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 12px;
         }
 
         .mode-box.baseline-mode {
-            background: rgba(56, 189, 248, 0.08);
-            border-color: rgba(56, 189, 248, 0.3);
+            background: rgba(0, 36, 31, 0.38);
+            border-color: rgba(125, 211, 252, 0.40);
         }
 
         /* H2H */
@@ -665,9 +709,31 @@
             border: 1px solid var(--border);
         }
 
-        .h2h-seg-a { background: var(--win); height: 100%; transition: width 0.3s; }
-        .h2h-seg-d { background: var(--draw); height: 100%; transition: width 0.3s; }
-        .h2h-seg-b { background: var(--blue-accent); height: 100%; transition: width 0.3s; }
+        .h2h-seg-a { background: #34d399; height: 100%; transition: width 0.3s; }
+        .h2h-seg-d { background: #facc15; height: 100%; transition: width 0.3s; }
+        .h2h-seg-b { background: #38bdf8; height: 100%; transition: width 0.3s; }
+
+        .profile-badges-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .profile-mini-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(0, 32, 28, 0.52);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
 
         /* BOTTOM NAV */
         .bottom-nav {
@@ -676,22 +742,25 @@
             left: 0;
             right: 0;
             z-index: 950;
-            background: rgba(9, 14, 26, 0.95);
-            backdrop-filter: blur(14px);
+            background: rgba(0, 62, 54, 0.58);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
             padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.22);
         }
 
         .nav-item {
             flex: 1;
             max-width: 150px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
+            background: rgba(136, 0, 0, 0.22);
+            border: 1px solid rgba(255, 160, 160, 0.18);
+            color: rgba(255, 255, 255, 0.82);
+            margin: 0 2px;
             padding: 6px 4px;
-            border-radius: 10px;
+            border-radius: 11px;
             font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
@@ -699,7 +768,7 @@
             flex-direction: column;
             align-items: center;
             gap: 3px;
-            transition: color 0.15s, background 0.15s;
+            transition: all 0.18s ease;
         }
 
         .nav-item svg {
@@ -707,9 +776,11 @@
             height: 20px;
         }
 
-        .nav-item.active {
-            color: var(--clay-light);
-            background: rgba(249, 115, 22, 0.1);
+        .nav-item.active, .nav-item:hover {
+            color: #ffffff;
+            background: var(--btn-glass-bg);
+            border-color: var(--btn-glass-border);
+            box-shadow: 0 4px 12px rgba(136, 0, 0, 0.42), inset 0 1px 1px rgba(255, 255, 255, 0.30);
             font-weight: 700;
         }
 
@@ -719,14 +790,16 @@
             top: 70px;
             left: 50%;
             transform: translateX(-50%) translateY(-20px);
-            background: #065f46;
-            border: 1px solid #34d399;
-            color: #ecfdf5;
+            background: rgba(0, 75, 65, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.40);
+            color: #ffffff;
             padding: 10px 18px;
             border-radius: 999px;
             font-size: 0.84rem;
             font-weight: 700;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
             z-index: 2000;
             opacity: 0;
             pointer-events: none;
@@ -742,8 +815,9 @@
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 24, 21, 0.72);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 1500;
             display: none;
             align-items: center;
@@ -756,13 +830,15 @@
         }
 
         .modal-box {
-            background: var(--bg-card);
+            background: rgba(0, 56, 49, 0.68);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 18px;
             max-width: 720px;
             width: 100%;
             padding: 16px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow), inset 0 1px 1px rgba(255, 255, 255, 0.25);
         }
 
         canvas#tvCanvas {
@@ -774,7 +850,6 @@
             margin-bottom: 12px;
         }
 
-
         /* ACHIEVEMENTS (ODZNAKY / SIEŇ SLÁVY) */
         .ach-grid {
             display: grid;
@@ -783,7 +858,9 @@
         }
 
         .ach-card {
-            background: linear-gradient(155deg, rgba(23, 35, 61, 0.92), rgba(12, 20, 37, 0.96));
+            background: rgba(0, 35, 30, 0.42);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 15px 14px;
@@ -792,21 +869,22 @@
             gap: 14px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.32);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.18);
             transition: transform 0.15s ease, border-color 0.2s ease;
         }
 
         .ach-card:hover {
             transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.48);
         }
 
-        .ach-card.ach-gold { border-color: rgba(245, 158, 11, 0.35); }
-        .ach-card.ach-lime { border-color: rgba(163, 230, 53, 0.35); }
-        .ach-card.ach-blue { border-color: rgba(56, 189, 248, 0.35); }
-        .ach-card.ach-red  { border-color: rgba(239, 68, 68, 0.35); }
-        .ach-card.ach-clay { border-color: rgba(249, 115, 22, 0.35); }
-        .ach-card.ach-purple { border-color: rgba(192, 132, 252, 0.35); }
-        .ach-card.ach-teal { border-color: rgba(45, 212, 191, 0.35); }
+        .ach-card.ach-gold { border-color: rgba(245, 158, 11, 0.42); }
+        .ach-card.ach-lime { border-color: rgba(190, 242, 100, 0.42); }
+        .ach-card.ach-blue { border-color: rgba(125, 211, 252, 0.42); }
+        .ach-card.ach-red  { border-color: rgba(252, 165, 165, 0.42); }
+        .ach-card.ach-clay { border-color: rgba(251, 146, 60, 0.42); }
+        .ach-card.ach-purple { border-color: rgba(216, 180, 254, 0.42); }
+        .ach-card.ach-teal { border-color: rgba(94, 234, 212, 0.42); }
 
         .ach-emblem {
             width: 56px;
@@ -816,7 +894,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.48));
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.38));
         }
 
         .hex-outer {
@@ -886,13 +964,13 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(9, 14, 26, 0.75);
-            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(136, 0, 0, 0.45);
+            border: 1px solid rgba(255, 160, 160, 0.35);
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 0.8rem;
             font-weight: 800;
-            color: var(--text-main);
+            color: #ffffff;
         }
 
         .ach-stat-value {
@@ -900,7 +978,7 @@
             font-size: 0.82rem;
             font-weight: 800;
             padding-top: 7px;
-            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.16);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -942,7 +1020,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.18</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.21</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1154,7 +1232,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 1.18)
+                        Aktívny režim histórie (Verzia 1.21)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1285,6 +1363,54 @@
         </section>
     </main>
 
+    <!-- MODAL PRE EDITÁCIU ZÁPASU -->
+    <div class="modal-backdrop" id="edit-match-modal" onclick="if(event.target===this) closeEditMatchModal()">
+        <div class="modal-box" style="max-width:520px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-title-dot"></span>
+                    Upraviť uložený zápas
+                </div>
+                <button class="icon-btn" onclick="closeEditMatchModal()">Zavrieť ✕</button>
+            </div>
+            <input type="hidden" id="edit-match-id">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="edit-date">Dátum zápasu</label>
+                    <input type="date" id="edit-date">
+                </div>
+                <div class="form-group">
+                    <label for="edit-gems">Presné gemy</label>
+                    <input type="text" id="edit-gems" placeholder="napr. 6:4 6:2">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="edit-p1">Hráč A</label>
+                    <select id="edit-p1"></select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-p2">Hráč B</label>
+                    <select id="edit-p2"></select>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-bottom:14px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="edit-sets1">Sety Hráč A</label>
+                    <input type="number" id="edit-sets1" min="0" max="5">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label for="edit-sets2">Sety Hráč B</label>
+                    <input type="number" id="edit-sets2" min="0" max="5">
+                </div>
+            </div>
+            <div class="grid-2">
+                <button class="btn btn-primary" onclick="saveEditedMatch()">Uložiť zmeny a prepočítať</button>
+                <button class="btn btn-secondary" onclick="closeEditMatchModal()">Zrušiť</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PRE TV GRAFIKU -->
     <div class="modal-backdrop" id="tv-modal" onclick="if(event.target===this) closeTvModal()">
         <div class="modal-box">
@@ -1321,13 +1447,13 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             H2H & Hráči
         </button>
-        <button class="nav-item" onclick="switchTab('sec-history', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            História
-        </button>
         <button class="nav-item" onclick="switchTab('sec-achievements', this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l7 4v6c0 5-3.5 9.2-7 10-3.5-.8-7-5-7-10V6l7-4z"/><path d="M9.5 12l2 2 3.5-3.5"/></svg>
             Odznaky
+        </button>
+        <button class="nav-item" onclick="switchTab('sec-history', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            História
         </button>
     </nav>
 
@@ -1424,6 +1550,7 @@
 
         let computedPlayers = [];
         let computedMatches = [];
+        let computedBadges = [];
         let timelinePoints = []; 
         let interactiveHitPoints = [];
 
@@ -1664,7 +1791,7 @@
         }
 
         function populateSelects() {
-            const ids = ["match-p1", "match-p2", "hist-p1", "hist-p2", "h2h-p1", "h2h-p2", "profile-select"];
+            const ids = ["match-p1", "match-p2", "hist-p1", "hist-p2", "h2h-p1", "h2h-p2", "profile-select", "edit-p1", "edit-p2"];
             const prevValues = {};
             ids.forEach(id => {
                 const el = document.getElementById(id);
@@ -2123,6 +2250,7 @@
                 }
             ];
 
+            computedBadges = badges;
             container.innerHTML = badges.map(b => {
                 const holdersHtml = b.holders.length > 0
                     ? b.holders.map(h => `
@@ -2158,9 +2286,9 @@
             renderChartChips();
             drawEloChart();
             renderH2H();
+            computeAndRenderAchievements();
             renderPlayerProfile();
             renderMatchHistory();
-            computeAndRenderAchievements();
         }
 
         function renderLeaderboard() {
@@ -2479,7 +2607,7 @@
 
             const visiblePlayers = computedPlayers.filter(p => state.chartVisiblePlayers[p.id] !== false);
             if (visiblePlayers.length === 0 || timelinePoints.length === 0) {
-                ctx.fillStyle = "#94a3b8";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
                 ctx.font = "13px sans-serif";
                 ctx.textAlign = "center";
                 ctx.fillText("Vyber aspoň jedného hráča pre zobrazenie grafu.", width / 2, height / 2);
@@ -2514,9 +2642,9 @@
                 return padT + plotH - ((eloVal - yMin) / (yMax - yMin)) * plotH;
             };
 
-            ctx.strokeStyle = "rgba(148, 163, 184, 0.12)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
             ctx.lineWidth = 1;
-            ctx.fillStyle = "#94a3b8";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
             ctx.font = "11px sans-serif";
             ctx.textAlign = "right";
 
@@ -2576,7 +2704,7 @@
                     const y = getY(val);
                     const isPlayedMatch = pt.match && (pt.match.p1 === p.id || pt.match.p2 === p.id);
 
-                    ctx.fillStyle = isPlayedMatch ? p.color : "#0c1425";
+                    ctx.fillStyle = isPlayedMatch ? p.color : "#003831";
                     ctx.strokeStyle = p.color;
                     ctx.lineWidth = 1.8;
                     ctx.beginPath();
@@ -2750,6 +2878,177 @@
             const netChange = (p.elo - startVal).toFixed(1);
             const netSign = netChange >= 0 ? `+${netChange}` : netChange;
 
+            // Výpočet bilancie proti jednotlivým súperom
+            const opponentsMap = {};
+            computedMatches.forEach(m => {
+                if (m.p1 !== id && m.p2 !== id) return;
+                const isFirst = m.p1 === id;
+                const oppId = isFirst ? m.p2 : m.p1;
+                const sA = isFirst ? Number(m.sets1) : Number(m.sets2);
+                const sB = isFirst ? Number(m.sets2) : Number(m.sets1);
+                const dElo = isFirst ? m.deltaA : m.deltaB;
+                const parsedG = parseGemsString(m.gems);
+                const gA = isFirst ? parsedG.g1 : parsedG.g2;
+                const gB = isFirst ? parsedG.g2 : parsedG.g1;
+
+                if (!opponentsMap[oppId]) {
+                    const oppObj = computedPlayers.find(x => x.id === oppId);
+                    opponentsMap[oppId] = {
+                        id: oppId,
+                        name: oppObj ? oppObj.name : oppId,
+                        color: oppObj ? oppObj.color : "#ffffff",
+                        matches: 0,
+                        wins: 0,
+                        losses: 0,
+                        draws: 0,
+                        setsWon: 0,
+                        setsLost: 0,
+                        gemsWon: 0,
+                        gemsLost: 0,
+                        netElo: 0
+                    };
+                }
+                const rec = opponentsMap[oppId];
+                rec.matches++;
+                rec.setsWon += sA;
+                rec.setsLost += sB;
+                rec.gemsWon += gA;
+                rec.gemsLost += gB;
+                rec.netElo = Math.round((rec.netElo + dElo) * 10) / 10;
+                if (sA > sB) rec.wins++;
+                else if (sB > sA) rec.losses++;
+                else rec.draws++;
+            });
+
+            const oppList = Object.values(opponentsMap);
+
+            // 1. Najčastejší súper (najviac odohratých vzájomných zápasov)
+            let mostFrequentOpp = null;
+            oppList.forEach(op => {
+                if (!mostFrequentOpp || op.matches > mostFrequentOpp.matches || (op.matches === mostFrequentOpp.matches && Math.abs(op.netElo) > Math.abs(mostFrequentOpp.netElo))) {
+                    mostFrequentOpp = op;
+                }
+            });
+
+            // 2. Najobľúbenejší súper (najviac výhier, pri rovnosti vyšší ELO zisk)
+            let favoriteOpp = null;
+            oppList.forEach(op => {
+                if (op.wins > 0 || op.netElo > 0) {
+                    if (!favoriteOpp || op.wins > favoriteOpp.wins || (op.wins === favoriteOpp.wins && op.netElo > favoriteOpp.netElo)) {
+                        favoriteOpp = op;
+                    }
+                }
+            });
+
+            // 3. Nemesis súper (najviac prehier, pri rovnosti najhoršia ELO bilancia)
+            let nemesisOpp = null;
+            oppList.forEach(op => {
+                if (op.losses > 0 || op.netElo < 0) {
+                    if (!nemesisOpp || op.losses > nemesisOpp.losses || (op.losses === nemesisOpp.losses && op.netElo < nemesisOpp.netElo)) {
+                        nemesisOpp = op;
+                    }
+                }
+            });
+
+            const rivalsHtml = `
+                <div class="grid-3" style="margin-top:10px;">
+                    <div class="stat-tile" style="text-align:left; border-color:rgba(125, 211, 252, 0.42);">
+                        <div class="stat-tile-label" style="color:var(--blue-accent);">🤝 Najčastejší súper</div>
+                        <div style="font-weight:800; font-size:0.94rem; margin-top:3px;">
+                            ${mostFrequentOpp ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${mostFrequentOpp.color};margin-right:5px;"></span>${mostFrequentOpp.name}` : '—'}
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                            ${mostFrequentOpp ? `${mostFrequentOpp.matches} záp. (${mostFrequentOpp.wins}V-${mostFrequentOpp.losses}P-${mostFrequentOpp.draws}R)` : 'Žiadne zápasy'}
+                        </div>
+                    </div>
+                    <div class="stat-tile" style="text-align:left; border-color:rgba(110, 231, 183, 0.42);">
+                        <div class="stat-tile-label" style="color:var(--win);">🎯 Najobľúbenejší súper</div>
+                        <div style="font-weight:800; font-size:0.94rem; margin-top:3px;">
+                            ${favoriteOpp ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${favoriteOpp.color};margin-right:5px;"></span>${favoriteOpp.name}` : '—'}
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                            ${favoriteOpp ? `${favoriteOpp.wins}V-${favoriteOpp.losses}P-${favoriteOpp.draws}R (${favoriteOpp.netElo >= 0 ? '+' : ''}${favoriteOpp.netElo.toFixed(1)} ELO)` : 'Zatiaľ bez výhry'}
+                        </div>
+                    </div>
+                    <div class="stat-tile" style="text-align:left; border-color:rgba(252, 165, 165, 0.42);">
+                        <div class="stat-tile-label" style="color:var(--loss);">⚡ Nemesis súper</div>
+                        <div style="font-weight:800; font-size:0.94rem; margin-top:3px;">
+                            ${nemesisOpp ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${nemesisOpp.color};margin-right:5px;"></span>${nemesisOpp.name}` : '—'}
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                            ${nemesisOpp ? `${nemesisOpp.wins}V-${nemesisOpp.losses}P-${nemesisOpp.draws}R (${nemesisOpp.netElo >= 0 ? '+' : ''}${nemesisOpp.netElo.toFixed(1)} ELO)` : 'Neporazený'}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Zoznam achievementov hráča
+            const ownedBadges = (computedBadges || []).filter(b => b.holders && b.holders.some(h => h.id === id));
+            const ownedBadgesHtml = `
+                <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border);">
+                    <div style="font-size:0.74rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">
+                        🏆 Získané achievementy a odznaky (${ownedBadges.length})
+                    </div>
+                    ${ownedBadges.length === 0
+                        ? `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Tento hráč zatiaľ nedrží žiaden rekordný odznak.</div>`
+                        : `<div class="profile-badges-wrap">
+                            ${ownedBadges.map(b => `
+                                <span class="profile-mini-badge" style="border-color:${b.accent}88;">
+                                    <span style="color:${b.accent};">★</span>
+                                    <strong>${b.title}</strong>
+                                    <span style="color:var(--text-muted); font-weight:600;">(${b.mainStatVal})</span>
+                                </span>
+                            `).join("")}
+                        </div>`
+                    }
+                </div>
+            `;
+
+            // Tabuľka bilancie so všetkými súpermi
+            const sortedOpp = [...oppList].sort((a, b) => b.matches - a.matches || b.netElo - a.netElo);
+            const oppTableHtml = sortedOpp.length === 0 ? "" : `
+                <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border);">
+                    <div style="font-size:0.74rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; letter-spacing:0.5px;">
+                        ⚔️ Kompletná bilancia proti súperom
+                    </div>
+                    <div class="table-wrap">
+                        <table class="elo-table">
+                            <thead>
+                                <tr>
+                                    <th>Súper</th>
+                                    <th class="text-right">Záp.</th>
+                                    <th class="text-right">Bilancia (V-P-R)</th>
+                                    <th class="text-right">Sety</th>
+                                    <th class="text-right">Gemy</th>
+                                    <th class="text-right">Úsp. (%)</th>
+                                    <th class="text-right">ELO bilancia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sortedOpp.map(op => {
+                                    const pct = (((op.wins + 0.5 * op.draws) / op.matches) * 100).toFixed(1);
+                                    const netStr = op.netElo >= 0 ? `+${op.netElo.toFixed(1)}` : op.netElo.toFixed(1);
+                                    return `
+                                        <tr>
+                                            <td>
+                                                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${op.color}; margin-right:6px;"></span>
+                                                <strong>${op.name}</strong>
+                                            </td>
+                                            <td class="text-right">${op.matches}</td>
+                                            <td class="text-right"><span style="color:var(--win); font-weight:700;">${op.wins}</span>-${op.losses}-${op.draws}</td>
+                                            <td class="text-right">${op.setsWon}:${op.setsLost}</td>
+                                            <td class="text-right" style="color:var(--text-muted);">${op.gemsWon}:${op.gemsLost}</td>
+                                            <td class="text-right"><strong>${pct}%</strong></td>
+                                            <td class="text-right" style="color:${op.netElo >= 0 ? 'var(--win)' : 'var(--loss)'}; font-weight:700;">${netStr}</td>
+                                        </tr>
+                                    `;
+                                }).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
             box.innerHTML = `
                 <div class="grid-3" style="margin-bottom:10px;">
                     <div class="stat-tile">
@@ -2773,6 +3072,9 @@
                     <span>Úspešnosť: <strong style="color:var(--clay-light)">${winPct}%</strong></span>
                     <span>Zaznamenané sety: <strong>${p.setsWon}:${p.setsLost}</strong> · Gemy: <strong>${p.gemsWon}:${p.gemsLost}</strong></span>
                 </div>
+                ${rivalsHtml}
+                ${ownedBadgesHtml}
+                ${oppTableHtml}
             `;
         }
 
@@ -2832,11 +3134,60 @@
                         </div>
                         <div class="match-actions">
                             ${orderBtns}
+                            <button class="icon-btn-alt" onclick="openEditMatchModal('${m.id}')" title="Upraviť zápas">✎</button>
                             <button class="icon-btn" onclick="deleteMatch('${m.id}')" title="Vymazať zápas a prepočítať ELO">✕</button>
                         </div>
                     </div>
                 `;
             }).join("");
+        }
+
+        function openEditMatchModal(matchId) {
+            const m = state.matches.find(x => x.id === matchId);
+            if (!m) return;
+            document.getElementById("edit-match-id").value = m.id;
+            document.getElementById("edit-date").value = m.date;
+            document.getElementById("edit-p1").value = m.p1;
+            document.getElementById("edit-p2").value = m.p2;
+            document.getElementById("edit-sets1").value = m.sets1;
+            document.getElementById("edit-sets2").value = m.sets2;
+            document.getElementById("edit-gems").value = m.gems || "";
+            document.getElementById("edit-match-modal").classList.add("open");
+        }
+
+        function closeEditMatchModal() {
+            document.getElementById("edit-match-modal").classList.remove("open");
+        }
+
+        function saveEditedMatch() {
+            const id = document.getElementById("edit-match-id").value;
+            const date = document.getElementById("edit-date").value;
+            const p1 = document.getElementById("edit-p1").value;
+            const p2 = document.getElementById("edit-p2").value;
+            const sets1 = parseInt(document.getElementById("edit-sets1").value, 10);
+            const sets2 = parseInt(document.getElementById("edit-sets2").value, 10);
+            const gems = document.getElementById("edit-gems").value.trim();
+
+            if (!date || !p1 || !p2 || p1 === p2) {
+                showToast("Vyber dvoch rôznych tenistov a platný dátum!", true);
+                return;
+            }
+            if (isNaN(sets1) || isNaN(sets2) || sets1 < 0 || sets2 < 0 || (sets1 === 0 && sets2 === 0)) {
+                showToast("Zadaj platný stav na sety!", true);
+                return;
+            }
+
+            const idx = state.matches.findIndex(x => x.id === id);
+            if (idx === -1) return;
+
+            state.matches[idx] = { id, date, p1, p2, sets1, sets2, gems };
+            closeEditMatchModal();
+            sortMatchesChronologically();
+            saveState();
+            recalculateAll();
+            populateSelects();
+            refreshAllViews();
+            showToast("Zápas bol upravený a celá história prepočítaná!");
         }
 
         function deleteMatch(matchId) {
@@ -2890,7 +3241,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v1.18_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v1.21_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -2934,7 +3285,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.18_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.21_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -2991,9 +3342,9 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.18 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V1.21 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
-            ctx.fillStyle = "#94a3b8";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
             ctx.font = "bold 20px sans-serif";
             ctx.textAlign = "right";
             const todayStr = new Date().toLocaleDateString("sk-SK");
@@ -3062,7 +3413,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V1.18_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V1.21_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
