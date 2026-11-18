@@ -1021,7 +1021,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.21</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.23</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1172,9 +1172,8 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot"></span>
-                        Vývoj ELO hodnotenia v čase (<span id="chart-steps-count">0</span> krokov)
+                        ELO v čase (<span id="chart-steps-count">0</span> zápasov)
                     </div>
-                    <button class="preset-btn" style="flex:0; padding:4px 10px; font-size:0.72rem;" onclick="toggleAllChartPlayers()">Všetci / Aktívni</button>
                 </div>
 
                 <div class="chart-controls" id="chart-player-chips"></div>
@@ -1233,7 +1232,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie (Verzia 1.21)
+                        Aktívny režim histórie (Verzia 1.23)
                     </div>
                     <span class="param-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -2239,7 +2238,7 @@
                     theme: "ach-purple",
                     accent: "#e879f9",
                     category: "Tenisový paradox",
-                    title: "Smoliar dňa (Viacej gemov, no prehra)",
+                    title: "Smoliar dňa",
                     desc: "Prehra v zápase napriek tomu, že hráč v súčte nahral rovnaký alebo vyšší počet gemov ako víťaz.",
                     holders: unluckyRes.holders,
                     mainStatLabel: "Smoliarske zápasy:",
@@ -2576,19 +2575,6 @@
                 };
                 wrap.appendChild(chip);
             });
-        }
-
-        function toggleAllChartPlayers() {
-            const activeIds = new Set();
-            computedMatches.forEach(m => { activeIds.add(m.p1); activeIds.add(m.p2); });
-
-            const allShown = computedPlayers.every(p => state.chartVisiblePlayers[p.id] !== false);
-            computedPlayers.forEach(p => {
-                state.chartVisiblePlayers[p.id] = allShown ? activeIds.has(p.id) : true;
-            });
-            saveState();
-            renderChartChips();
-            drawEloChart();
         }
 
         function drawEloChart(highlightStep = null) {
@@ -2952,7 +2938,7 @@
             });
 
             const rivalsHtml = `
-                <div class="grid-3" style="margin-top:10px;">
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
                     <div class="stat-tile" style="text-align:left; border-color:rgba(125, 211, 252, 0.42);">
                         <div class="stat-tile-label" style="color:var(--blue-accent);">🤝 Najčastejší súper</div>
                         <div style="font-weight:800; font-size:0.94rem; margin-top:3px;">
@@ -2963,7 +2949,7 @@
                         </div>
                     </div>
                     <div class="stat-tile" style="text-align:left; border-color:rgba(110, 231, 183, 0.42);">
-                        <div class="stat-tile-label" style="color:var(--win);">🎯 Najobľúbenejší súper</div>
+                        <div class="stat-tile-label" style="color:var(--win);">🎯 Obľúbený súper</div>
                         <div style="font-weight:800; font-size:0.94rem; margin-top:3px;">
                             ${favoriteOpp ? `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${favoriteOpp.color};margin-right:5px;"></span>${favoriteOpp.name}` : '—'}
                         </div>
@@ -3242,7 +3228,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const a = document.createElement("a");
             a.href = dataStr;
-            a.download = `ELO2MASTER_v1.21_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            a.download = `ELO2MASTER_v1.23_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             a.click();
         }
 
@@ -3286,7 +3272,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `ELO2MASTER_v1.21_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            a.download = `ELO2MASTER_v1.23_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             a.click();
         }
 
@@ -3343,7 +3329,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "bold 28px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.21 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
+            ctx.fillText("ELO2MASTER V1.23 | PRIEBEŽNÁ TABUĽKA", tableX + 28, topY + 42);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
             ctx.font = "bold 20px sans-serif";
@@ -3414,7 +3400,7 @@
             const canvas = document.getElementById("tvCanvas");
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = `ELO2MASTER_V1.21_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            a.download = `ELO2MASTER_V1.23_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
             a.click();
         }
 
