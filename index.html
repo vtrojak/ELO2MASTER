@@ -1005,56 +1005,110 @@
             margin-bottom: 12px;
         }
 
-        /* ACHIEVEMENTS (ODZNAKY / SIEŇ SLÁVY) */
+        /* ACHIEVEMENTS (ODZNAKY / SIEŇ SLÁVY) – PRISPÔSOBENÉ PRE TRANSPARENTNÉ 256×256 PNG IKONY */
         .ach-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 14px;
         }
 
         .ach-card {
-            background: rgba(0, 35, 30, 0.42);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            --ach-glow: rgba(255, 255, 255, 0.22);
+            --ach-tint: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(145deg, rgba(0, 32, 28, 0.56), rgba(0, 20, 18, 0.46));
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 15px 14px;
+            border-radius: 16px;
+            padding: 16px 14px;
             display: flex;
             align-items: flex-start;
             gap: 14px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.18);
-            transition: transform 0.15s ease, border-color 0.2s ease;
+            box-shadow: 0 8px 24px rgba(0, 18, 16, 0.34), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+            transition: transform 0.18s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .ach-card::before {
+            content: "";
+            position: absolute;
+            top: -24px;
+            left: -24px;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, var(--ach-tint) 0%, transparent 72%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .ach-card:hover {
             transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.48);
+            border-color: var(--ach-glow);
+            box-shadow: 0 10px 28px rgba(0, 14, 12, 0.46), 0 0 18px var(--ach-tint), inset 0 1px 1px rgba(255, 255, 255, 0.26);
         }
 
-        .ach-card.ach-gold { border-color: rgba(245, 158, 11, 0.42); }
-        .ach-card.ach-lime { border-color: rgba(190, 242, 100, 0.42); }
-        .ach-card.ach-blue { border-color: rgba(125, 211, 252, 0.42); }
-        .ach-card.ach-red  { border-color: rgba(252, 165, 165, 0.42); }
-        .ach-card.ach-clay { border-color: rgba(251, 146, 60, 0.42); }
-        .ach-card.ach-purple { border-color: rgba(216, 180, 254, 0.42); }
-        .ach-card.ach-teal { border-color: rgba(94, 234, 212, 0.42); }
+        .ach-card.ach-green {
+            --ach-glow: rgba(74, 222, 128, 0.58);
+            --ach-tint: rgba(74, 222, 128, 0.20);
+            border-color: rgba(74, 222, 128, 0.36);
+        }
+        .ach-card.ach-blue {
+            --ach-glow: rgba(56, 189, 248, 0.58);
+            --ach-tint: rgba(56, 189, 248, 0.20);
+            border-color: rgba(56, 189, 248, 0.36);
+        }
+        .ach-card.ach-purple {
+            --ach-glow: rgba(192, 132, 252, 0.58);
+            --ach-tint: rgba(192, 132, 252, 0.20);
+            border-color: rgba(192, 132, 252, 0.36);
+        }
+        .ach-card.ach-red {
+            --ach-glow: rgba(248, 113, 113, 0.58);
+            --ach-tint: rgba(248, 113, 113, 0.20);
+            border-color: rgba(248, 113, 113, 0.36);
+        }
 
         .ach-emblem {
-            width: 56px;
-            height: 56px;
+            width: 80px;
+            height: 80px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.38));
+            z-index: 1;
+            background: transparent;
+        }
+
+        .ach-icon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            background: transparent;
+            user-select: none;
+            -webkit-user-drag: none;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 8px var(--ach-tint));
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.22s ease;
+        }
+
+        .ach-card:hover .ach-icon-img {
+            transform: scale(1.07);
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.52)) drop-shadow(0 0 14px var(--ach-glow));
+        }
+
+        .ach-fallback-hex {
+            width: 68px;
+            height: 68px;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.42));
         }
 
         .hex-outer {
-            width: 54px;
-            height: 54px;
+            width: 64px;
+            height: 64px;
             clip-path: polygon(50% 3%, 93% 26%, 93% 74%, 50% 97%, 7% 74%, 7% 26%);
             display: flex;
             align-items: center;
@@ -1073,9 +1127,19 @@
         }
 
         .hex-inner i {
-            font-size: 1.28rem;
+            font-size: 1.45rem;
             line-height: 1;
             display: inline-block;
+        }
+
+        .profile-mini-badge-img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            background: transparent;
+            flex-shrink: 0;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
         }
 
         .inline-ico {
@@ -1089,6 +1153,8 @@
         .ach-body {
             flex: 1;
             min-width: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .ach-cat-tag {
@@ -1250,6 +1316,10 @@
             .ach-grid {
                 grid-template-columns: 1fr;
             }
+            .ach-emblem {
+                width: 72px;
+                height: 72px;
+            }
             .bottom-nav .nav-item {
                 font-size: 0.62rem;
                 padding: 6px 2px;
@@ -1277,7 +1347,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.31</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.32</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1492,7 +1562,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.31)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.32)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1615,7 +1685,7 @@
                                 <span><svg class="inline-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 5-3.5 9.2-7 10-3.5-.8-7-5-7-10V6l7-4z"/></svg> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.31_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.32_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -1798,6 +1868,21 @@
     <script>
         const STORAGE_KEY = "ELO2MASTER_DB_V14";
         const REMOTE_JSON_FILES = ["databaza.json", "data.json"];
+        const ACHIEVEMENT_ICON_DIRS = ["./", "./icons/", "./ikony/", "./badges/", "./img/", "./images/", "./achievements/"];
+
+        function handleAchIconError(imgEl) {
+            const file = imgEl.getAttribute("data-icon-file");
+            const nextIdx = (parseInt(imgEl.getAttribute("data-dir-idx") || "0", 10)) + 1;
+            if (file && nextIdx < ACHIEVEMENT_ICON_DIRS.length) {
+                imgEl.setAttribute("data-dir-idx", String(nextIdx));
+                imgEl.src = ACHIEVEMENT_ICON_DIRS[nextIdx] + file;
+            } else {
+                imgEl.onerror = null;
+                imgEl.style.display = "none";
+                const fallback = imgEl.nextElementSibling;
+                if (fallback) fallback.style.display = fallback.dataset.fallbackDisplay || "flex";
+            }
+        }
 
         const PLAYER_COLORS = [
             "#f97316", // Vlado
@@ -2559,21 +2644,23 @@
             const robinHoodRes = getLeaders("worstLossDonate");
             const unluckyRes = getLeaders("unluckyLosses");
 
-            const getHexBadgeHtml = (faClass, themeKey) => {
+            const getAchievementIconHtml = (iconFile, title, faClass, themeKey) => {
                 const palettes = {
-                    "ach-lime":   { bg1: "#1a2e05", bg2: "#090e1a", border: "#a3e635", fg: "#bef264" },
-                    "ach-red":    { bg1: "#450a0a", bg2: "#090e1a", border: "#ef4444", fg: "#f87171" },
-                    "ach-gold":   { bg1: "#451a03", bg2: "#090e1a", border: "#f59e0b", fg: "#fbbf24" },
-                    "ach-clay":   { bg1: "#431407", bg2: "#090e1a", border: "#f97316", fg: "#fb923c" },
+                    "ach-green":  { bg1: "#052e16", bg2: "#090e1a", border: "#4ade80", fg: "#86efac" },
                     "ach-blue":   { bg1: "#082f49", bg2: "#090e1a", border: "#38bdf8", fg: "#7dd3fc" },
                     "ach-purple": { bg1: "#3b0764", bg2: "#090e1a", border: "#c084fc", fg: "#e879f9" },
-                    "ach-teal":   { bg1: "#042f2e", bg2: "#090e1a", border: "#2dd4bf", fg: "#5eead4" }
+                    "ach-red":    { bg1: "#450a0a", bg2: "#090e1a", border: "#f87171", fg: "#fca5a5" }
                 };
-                const pal = palettes[themeKey] || palettes["ach-gold"];
+                const pal = palettes[themeKey] || palettes["ach-green"];
+                const safeTitle = escapeHtml(title);
+                const safeFile = escapeHtml(iconFile);
                 return `
-                    <div class="hex-outer" style="background: ${pal.border};">
-                        <div class="hex-inner" style="background: linear-gradient(145deg, ${pal.bg1}, ${pal.bg2});">
-                            <i class="${faClass}" style="color: ${pal.fg};" aria-hidden="true"></i>
+                    <img class="ach-icon-img" src="${ACHIEVEMENT_ICON_DIRS[0]}${safeFile}" alt="${safeTitle}" width="80" height="80" loading="lazy" decoding="async" data-icon-file="${safeFile}" data-dir-idx="0" onerror="handleAchIconError(this)">
+                    <div class="ach-fallback-hex" data-fallback-display="flex" style="display:none;">
+                        <div class="hex-outer" style="background: ${pal.border};">
+                            <div class="hex-inner" style="background: linear-gradient(145deg, ${pal.bg1}, ${pal.bg2});">
+                                <i class="${faClass}" style="color: ${pal.fg};" aria-hidden="true"></i>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -2586,11 +2673,12 @@
             };
 
             const badges = [
-                // 1. Neporaziteľný
+                // 1. Neporaziteľný -> neporazeny.png (zelený hexagón)
                 {
                     id: "win_streak",
-                    theme: "ach-lime",
-                    accent: "#a3e635",
+                    iconFile: "neporazeny.png",
+                    theme: "ach-green",
+                    accent: "#4ade80",
                     category: "Dominancia & Forma",
                     title: "Neporaziteľný",
                     desc: "Najdlhšia séria víťazných zápasov v rade za sebou bez prehry či remízy.",
@@ -2600,13 +2688,14 @@
                     subStat: curWinRes.maxVal > 0
                         ? `Aktuálne ťahá: ${curWinRes.holders.map(h => h.name).join(", ")} (${curWinRes.maxVal}V)`
                         : "Aktuálne bez aktívnej šnúry",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-fire", "ach-lime")
+                    iconHtml: getAchievementIconHtml("neporazeny.png", "Neporaziteľný", "fa-solid fa-shield-halved", "ach-green")
                 },
-                // 2. Voľný pád
+                // 2. Voľný pád -> pad.png (červený hexagón)
                 {
                     id: "loss_streak",
+                    iconFile: "pad.png",
                     theme: "ach-red",
-                    accent: "#ef4444",
+                    accent: "#f87171",
                     category: "Čierna séria",
                     title: "Voľný pád",
                     desc: "Najviac prehratých zápasov v rade za sebou bez zisku čo i len remízy.",
@@ -2614,13 +2703,14 @@
                     mainStatLabel: "Rekordná séria:",
                     mainStatVal: `${lossStreakRes.maxVal} prehier v rade`,
                     subStat: "Najdlhšie čakanie na bodový zápis",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-anchor", "ach-red")
+                    iconHtml: getAchievementIconHtml("pad.png", "Voľný pád", "fa-solid fa-arrow-trend-down", "ach-red")
                 },
-                // 3. Kráľ kanárov (Čistič)
+                // 3. Čistič -> cistic.png (zelený hexagón)
                 {
                     id: "bagels_given",
-                    theme: "ach-gold",
-                    accent: "#f59e0b",
+                    iconFile: "cistic.png",
+                    theme: "ach-green",
+                    accent: "#4ade80",
                     category: "Zverimex",
                     title: "Čistič",
                     desc: "Hráč, ktorý súperom uštedril najviac čistých setov pomerom 6:0.",
@@ -2628,13 +2718,14 @@
                     mainStatLabel: "Rozdané kanáre:",
                     mainStatVal: `${bagelsGivenRes.maxVal}× set 6:0`,
                     subStat: "Absolútna dominancia v sete bez straty gemu",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-broom", "ach-gold")
+                    iconHtml: getAchievementIconHtml("cistic.png", "Čistič", "fa-solid fa-broom", "ach-green")
                 },
-                // 4. Kŕmič vtáčkov
+                // 4. Kŕmič vtáčkov -> krmic.png (červený hexagón)
                 {
                     id: "bagels_received",
-                    theme: "ach-clay",
-                    accent: "#f97316",
+                    iconFile: "krmic.png",
+                    theme: "ach-red",
+                    accent: "#f87171",
                     category: "Chovateľská stanica",
                     title: "Kŕmič vtáčkov",
                     desc: "Hráč, ktorý v doterajšej histórii vyfasoval od súperov najviac kanárov 0:6.",
@@ -2642,11 +2733,12 @@
                     mainStatLabel: "Inkasované kanáre:",
                     mainStatVal: `${bagelsRecRes.maxVal}× set 0:6`,
                     subStat: "Keď sa v sete nepodarí uchmatnúť ani gem",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-crow", "ach-clay")
+                    iconHtml: getAchievementIconHtml("krmic.png", "Kŕmič vtáčkov", "fa-solid fa-crow", "ach-red")
                 },
-                // 5. Tiebreakový špecialista
+                // 5. Tiebreakový špecialista -> tiebreak.png (modrý hexagón)
                 {
                     id: "tiebreak_king",
+                    iconFile: "tiebreak.png",
                     theme: "ach-blue",
                     accent: "#38bdf8",
                     category: "Nervy zo železa",
@@ -2658,13 +2750,14 @@
                     subStat: tbPlayedRes.holders.length > 0
                         ? `Bilancia lídra v TB: ${tbPlayedRes.holders.map(h => `${h.name} (${h.tiebreaksWon}V / ${h.tiebreaksPlayed - h.tiebreaksWon}P)`).join(", ")}`
                         : "Zatiaľ bez tiebreaku",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-stopwatch", "ach-blue")
+                    iconHtml: getAchievementIconHtml("tiebreak.png", "Tiebreakový špecialista", "fa-solid fa-7", "ach-blue")
                 },
-                // 6. Zabijak obrov (Giant Slayer)
+                // 6. Zabijak obrov -> obor.png (modrý hexagón)
                 {
                     id: "giant_slayer",
-                    theme: "ach-purple",
-                    accent: "#c084fc",
+                    iconFile: "obor.png",
+                    theme: "ach-blue",
+                    accent: "#38bdf8",
                     category: "ELO Míľniky",
                     title: "Zabijak obrov",
                     desc: "Najväčší jednorazový zisk ELO bodov v jednom zápase po víťazstve nad papierovým favoritom.",
@@ -2674,13 +2767,14 @@
                     subStat: giantSlayerRes.holders.length > 0
                         ? formatMultiHolderDetails(giantSlayerRes.holders, "bestGainDetail")
                         : "Zatiaľ bez záznamu",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-bolt", "ach-purple")
+                    iconHtml: getAchievementIconHtml("obor.png", "Zabijak obrov", "fa-solid fa-bolt", "ach-blue")
                 },
-                // 7. Vrchol potravinového reťazca (Peak Master)
+                // 7. Vrchol reťazca -> vrchol.png (zelený hexagón)
                 {
                     id: "peak_master",
-                    theme: "ach-gold",
-                    accent: "#facc15",
+                    iconFile: "vrchol.png",
+                    theme: "ach-green",
+                    accent: "#4ade80",
                     category: "Historické maximum",
                     title: "Vrchol reťazca",
                     desc: "Držiteľ absolútne najvyššieho dosiahnutého ELO hodnotenia v celej histórii rebríčka.",
@@ -2688,13 +2782,14 @@
                     mainStatLabel: "Historický Peak:",
                     mainStatVal: `${peakEloRes.maxVal.toFixed(1)} ELO`,
                     subStat: "Najvyššia zaznamenaná forma na kurte",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-mountain", "ach-gold")
+                    iconHtml: getAchievementIconHtml("vrchol.png", "Vrchol reťazca", "fa-solid fa-mountain", "ach-green")
                 },
-                // 8. Chirurg (Suverén)
+                // 8. Chirurg -> chirurg.png (zelený hexagón)
                 {
                     id: "clean_sweeps",
-                    theme: "ach-lime",
-                    accent: "#a3e635",
+                    iconFile: "chirurg.png",
+                    theme: "ach-green",
+                    accent: "#4ade80",
                     category: "Suverénna jazda",
                     title: "Chirurg",
                     desc: "Najviac víťazných zápasov bez straty jediného setu (výsledky 2:0 alebo 3:0 na sety).",
@@ -2702,13 +2797,14 @@
                     mainStatLabel: "Čisté výhry:",
                     mainStatVal: `${cleanSweepsRes.maxVal}× bez straty setu`,
                     subStat: "Stopercentná kontrola od prvej po poslednú loptičku",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-star", "ach-lime")
+                    iconHtml: getAchievementIconHtml("chirurg.png", "Chirurg", "fa-solid fa-heart-pulse", "ach-green")
                 },
-                // 9. Kráľ obratov (Comeback Kid)
+                // 9. Kráľ obratov -> obrat.png (fialový hexagón)
                 {
                     id: "comeback_kid",
-                    theme: "ach-blue",
-                    accent: "#38bdf8",
+                    iconFile: "obrat.png",
+                    theme: "ach-purple",
+                    accent: "#c084fc",
                     category: "Mentálna odolnosť",
                     title: "Kráľ obratov",
                     desc: "Tenista, ktorý dokázal najviackrát otočiť a vyhrať zápas po prehratom prvom sete.",
@@ -2716,13 +2812,14 @@
                     mainStatLabel: "Otočené zápasy:",
                     mainStatVal: `${comebacksRes.maxVal}× obrat z 0:1`,
                     subStat: "Prehratý prvý set je len zahrievacie kolo",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-rotate-left", "ach-blue")
+                    iconHtml: getAchievementIconHtml("obrat.png", "Kráľ obratov", "fa-solid fa-rotate-left", "ach-purple")
                 },
-                // 10. Maratónec (Železný muž)
+                // 10. Maratónec -> maratonec.png (fialový hexagón)
                 {
                     id: "marathon_man",
-                    theme: "ach-clay",
-                    accent: "#f97316",
+                    iconFile: "maratonec.png",
+                    theme: "ach-purple",
+                    accent: "#c084fc",
                     category: "Vytrvalosť na antuke",
                     title: "Maratónec",
                     desc: "Hráč s najvyšším počtom odohraných trojsetových zápasov (2:1, 1:2, 3:0 alebo 0:3).",
@@ -2730,13 +2827,14 @@
                     mainStatLabel: "Trojsetové zápasy:",
                     mainStatVal: `${marathonRes.maxVal}× plná minutáž`,
                     subStat: "Kondícia pripravená na dlhé výmeny",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-battery-full", "ach-clay")
+                    iconHtml: getAchievementIconHtml("maratonec.png", "Maratónec", "fa-solid fa-battery-full", "ach-purple")
                 },
-                // 11. Zmierlivý diplomat (Kráľ remíz)
+                // 11. Diplomat -> diplomat.png (modrý hexagón)
                 {
                     id: "diplomat",
-                    theme: "ach-teal",
-                    accent: "#2dd4bf",
+                    iconFile: "diplomat.png",
+                    theme: "ach-blue",
+                    accent: "#38bdf8",
                     category: "Šalamúnske riešenie",
                     title: "Diplomat",
                     desc: "Tenista s najvyšším počtom nerozhodných zápasov ukončených zmierlivým stavom 1:1 na sety.",
@@ -2744,13 +2842,14 @@
                     mainStatLabel: "Odohrané remízy:",
                     mainStatVal: `${diplomatRes.maxVal}× stav 1:1`,
                     subStat: "Keď vyhrá priateľstvo alebo vyprší čas kurtu",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-scale-balanced", "ach-teal")
+                    iconHtml: getAchievementIconHtml("diplomat.png", "Diplomat", "fa-solid fa-scale-balanced", "ach-blue")
                 },
-                // 12. Jánošík (Robin Hood)
+                // 12. Jánošík -> janosik.png (červený hexagón)
                 {
                     id: "robin_hood",
+                    iconFile: "janosik.png",
                     theme: "ach-red",
-                    accent: "#f43f5e",
+                    accent: "#f87171",
                     category: "Štedrý darca",
                     title: "Jánošík",
                     desc: "Hráč, ktorý v jednom zápase odovzdal súperovi najväčšiu porciu ELO bodov (prehra favorita).",
@@ -2760,13 +2859,14 @@
                     subStat: robinHoodRes.holders.length > 0
                         ? formatMultiHolderDetails(robinHoodRes.holders, "worstLossDetail")
                         : "Zatiaľ bez záznamu",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-hand-holding-dollar", "ach-red")
+                    iconHtml: getAchievementIconHtml("janosik.png", "Jánošík", "fa-solid fa-hand-holding-dollar", "ach-red")
                 },
-                // 13. Smoliar dňa (Tesnotka)
+                // 13. Smoliar dňa -> smoliar.png (fialový hexagón)
                 {
                     id: "unlucky_loser",
+                    iconFile: "smoliar.png",
                     theme: "ach-purple",
-                    accent: "#e879f9",
+                    accent: "#c084fc",
                     category: "Tenisový paradox",
                     title: "Smoliar dňa",
                     desc: "Prehra v zápase napriek tomu, že hráč v súčte nahral rovnaký alebo vyšší počet gemov ako víťaz.",
@@ -2776,7 +2876,7 @@
                     subStat: unluckyRes.holders.length > 0
                         ? formatMultiHolderDetails(unluckyRes.holders, "unluckyLastDetail")
                         : "Zatiaľ sa nikomu nestalo",
-                    iconHtml: getHexBadgeHtml("fa-solid fa-heart-crack", "ach-purple")
+                    iconHtml: getAchievementIconHtml("smoliar.png", "Smoliar dňa", "fa-solid fa-heart-crack", "ach-purple")
                 }
             ];
 
@@ -3591,7 +3691,8 @@
                         : `<div class="profile-badges-wrap">
                             ${ownedBadges.map(b => `
                                 <span class="profile-mini-badge" style="border-color:${b.accent}88;">
-                                    <span style="color:${b.accent};">★</span>
+                                    <img class="profile-mini-badge-img" src="${ACHIEVEMENT_ICON_DIRS[0]}${escapeHtml(b.iconFile)}" alt="${escapeHtml(b.title)}" width="22" height="22" loading="lazy" data-icon-file="${escapeHtml(b.iconFile)}" data-dir-idx="0" onerror="handleAchIconError(this)">
+                                    <span data-fallback-display="inline" style="display:none; color:${b.accent};">★</span>
                                     <strong>${b.title}</strong>
                                     <span style="color:var(--text-muted); font-weight:600;">(${b.mainStatVal})</span>
                                 </span>
@@ -3849,7 +3950,7 @@
                 exportedAtIso: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json;charset=utf-8" });
-            const filename = customFilename || `ELO2MASTER_v1.31_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            const filename = customFilename || `ELO2MASTER_v1.32_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             triggerBlobDownload(blob, filename);
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -3898,7 +3999,7 @@
                 csv += `${i+1};${p.name};${p.elo.toFixed(1).replace('.', ',')};${p.matches};${p.wins};${p.losses};${p.draws};${winPct.replace('.', ',')}\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const filename = `ELO2MASTER_v1.31_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            const filename = `ELO2MASTER_v1.32_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             triggerBlobDownload(blob, filename);
         }
 
@@ -4124,7 +4225,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.31 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
+            ctx.fillText("ELO2MASTER V1.32 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
             ctx.font = "700 22px sans-serif";
@@ -4288,7 +4389,7 @@
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const filename = `ELO2MASTER_V1.31_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.32_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
 
             try {
                 // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
