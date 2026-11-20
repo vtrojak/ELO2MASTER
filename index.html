@@ -473,6 +473,34 @@
             white-space: nowrap;
         }
 
+        table.elo-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.15s, background 0.15s;
+            border-radius: 6px;
+        }
+
+        table.elo-table th.sortable:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        table.elo-table th.sortable.sort-active {
+            color: var(--tennis-lime);
+        }
+
+        .sort-arrow {
+            display: inline-block;
+            margin-left: 3px;
+            font-size: 0.62rem;
+            opacity: 0.45;
+        }
+
+        table.elo-table th.sortable.sort-active .sort-arrow {
+            opacity: 1;
+            color: var(--tennis-lime);
+        }
+
         table.elo-table td {
             padding: 11px 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -1376,7 +1404,7 @@
             font-size: 0.74rem;
             color: var(--text-muted);
             margin-bottom: 10px;
-            line-height: 1.35;
+            line-height: 1.36;
         }
 
         .ach-holders {
@@ -1545,7 +1573,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.35</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.36</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1585,15 +1613,15 @@
                     <table class="elo-table" id="leaderboard-table">
                         <thead>
                             <tr>
-                                <th>Por.</th>
-                                <th>Meno</th>
-                                <th class="text-right">ELO</th>
-                                <th class="text-right">Záp.</th>
-                                <th class="text-right">V</th>
-                                <th class="text-right">P</th>
-                                <th class="text-right">R</th>
-                                <th class="text-right">Úsp. (%)</th>
-                                <th class="text-center">Forma</th>
+                                <th class="sortable" data-sort-key="rank" onclick="setTableSort('rank')">Por.<span class="sort-arrow"></span></th>
+                                <th class="sortable" data-sort-key="name" onclick="setTableSort('name')">Meno<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="elo" onclick="setTableSort('elo')">ELO<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="matches" onclick="setTableSort('matches')">Záp.<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="wins" onclick="setTableSort('wins')">V<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="losses" onclick="setTableSort('losses')">P<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="draws" onclick="setTableSort('draws')">R<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="winPct" onclick="setTableSort('winPct')">Úsp. (%)<span class="sort-arrow"></span></th>
+                                <th class="text-center sortable" data-sort-key="form" onclick="setTableSort('form')">Forma<span class="sort-arrow"></span></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1765,7 +1793,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.35)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.36)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1888,7 +1916,7 @@
                                 <span><svg class="inline-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 5-3.5 9.2-7 10-3.5-.8-7-5-7-10V6l7-4z"/></svg> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.35_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.36_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -3216,6 +3244,66 @@
             renderMatchHistory();
         }
 
+        let tableSort = { key: "elo", dir: "desc" };
+
+        function setTableSort(key) {
+            if (tableSort.key === key) {
+                tableSort.dir = tableSort.dir === "desc" ? "asc" : "desc";
+            } else {
+                tableSort.key = key;
+                tableSort.dir = "desc";
+            }
+            renderLeaderboard();
+        }
+
+        function getFormScore(formArr) {
+            if (!formArr || formArr.length === 0) return -1;
+            const last5 = formArr.slice(-5);
+            return last5.reduce((acc, f) => acc + (f === "W" ? 1 : (f === "D" ? 0.5 : 0)), 0);
+        }
+
+        function updateSortIndicators() {
+            const ths = document.querySelectorAll("#leaderboard-table thead th.sortable");
+            ths.forEach(th => {
+                const key = th.getAttribute("data-sort-key");
+                const arrow = th.querySelector(".sort-arrow");
+                if (key === tableSort.key) {
+                    th.classList.add("sort-active");
+                    if (arrow) arrow.textContent = tableSort.dir === "desc" ? "▼" : "▲";
+                } else {
+                    th.classList.remove("sort-active");
+                    if (arrow) arrow.textContent = "⇅";
+                }
+            });
+        }
+
+        function getSortedPlayers() {
+            const { key, dir } = tableSort;
+            const mult = dir === "desc" ? -1 : 1;
+
+            return computedPlayers.map((p, idx) => ({ ...p, baseRank: idx + 1 })).sort((a, b) => {
+                if (key === "name") {
+                    return a.name.localeCompare(b.name, "sk") * mult;
+                }
+                const getVal = (p) => {
+                    switch (key) {
+                        case "rank": return p.baseRank;
+                        case "elo": return p.elo;
+                        case "matches": return p.matches;
+                        case "wins": return p.wins;
+                        case "losses": return p.losses;
+                        case "draws": return p.draws;
+                        case "winPct": return p.matches > 0 ? ((p.wins + 0.5 * p.draws) / p.matches) * 100 : -1;
+                        case "form": return getFormScore(p.form);
+                        default: return p.elo;
+                    }
+                };
+                const diff = getVal(a) - getVal(b);
+                if (diff !== 0) return diff * mult;
+                return b.elo - a.elo;
+            });
+        }
+
         function renderLeaderboard() {
             const tbody = document.querySelector("#leaderboard-table tbody");
             tbody.innerHTML = "";
@@ -3293,8 +3381,10 @@
                 lmMeta.textContent = "Pridaj prvý zápas v sekcii Nový zápas";
             }
 
-            computedPlayers.forEach((p, idx) => {
-                const rank = idx + 1;
+            updateSortIndicators();
+
+            getSortedPlayers().forEach((p) => {
+                const rank = p.baseRank;
                 const winPct = p.matches > 0
                     ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1)
                     : "0.0";
@@ -4258,7 +4348,7 @@
                 exportedAtIso: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json;charset=utf-8" });
-            const filename = customFilename || `ELO2MASTER_v1.35_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            const filename = customFilename || `ELO2MASTER_v1.36_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             triggerBlobDownload(blob, filename);
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -4307,7 +4397,7 @@
                 csv += `${i+1};${p.name};${p.elo.toFixed(1).replace('.', ',')};${p.matches};${p.wins};${p.losses};${p.draws};${winPct.replace('.', ',')}\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const filename = `ELO2MASTER_v1.35_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            const filename = `ELO2MASTER_v1.36_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             triggerBlobDownload(blob, filename);
         }
 
@@ -4619,7 +4709,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.35 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
+            ctx.fillText("ELO2MASTER V1.36 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
             ctx.font = "700 22px sans-serif";
@@ -4783,7 +4873,7 @@
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const filename = `ELO2MASTER_V1.35_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.36_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
 
             try {
                 // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
