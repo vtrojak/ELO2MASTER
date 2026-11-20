@@ -1404,7 +1404,7 @@
             font-size: 0.74rem;
             color: var(--text-muted);
             margin-bottom: 10px;
-            line-height: 1.36;
+            line-height: 1.35;
         }
 
         .ach-holders {
@@ -1573,7 +1573,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.36</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.37</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1620,6 +1620,7 @@
                                 <th class="text-right sortable" data-sort-key="wins" onclick="setTableSort('wins')">V<span class="sort-arrow"></span></th>
                                 <th class="text-right sortable" data-sort-key="losses" onclick="setTableSort('losses')">P<span class="sort-arrow"></span></th>
                                 <th class="text-right sortable" data-sort-key="draws" onclick="setTableSort('draws')">R<span class="sort-arrow"></span></th>
+                                <th class="text-right sortable" data-sort-key="gemPct" onclick="setTableSort('gemPct')">Gemy (%)<span class="sort-arrow"></span></th>
                                 <th class="text-right sortable" data-sort-key="winPct" onclick="setTableSort('winPct')">Úsp. (%)<span class="sort-arrow"></span></th>
                                 <th class="text-center sortable" data-sort-key="form" onclick="setTableSort('form')">Forma<span class="sort-arrow"></span></th>
                             </tr>
@@ -1793,7 +1794,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.36)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.37)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -1916,7 +1917,7 @@
                                 <span><svg class="inline-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 5-3.5 9.2-7 10-3.5-.8-7-5-7-10V6l7-4z"/></svg> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.36_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.37_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -3293,6 +3294,10 @@
                         case "wins": return p.wins;
                         case "losses": return p.losses;
                         case "draws": return p.draws;
+                        case "gemPct": {
+                            const tg = p.gemsWon + p.gemsLost;
+                            return tg > 0 ? (p.gemsWon / tg) * 100 : -1;
+                        }
                         case "winPct": return p.matches > 0 ? ((p.wins + 0.5 * p.draws) / p.matches) * 100 : -1;
                         case "form": return getFormScore(p.form);
                         default: return p.elo;
@@ -3388,6 +3393,8 @@
                 const winPct = p.matches > 0
                     ? (((p.wins + 0.5 * p.draws) / p.matches) * 100).toFixed(1)
                     : "0.0";
+                const totalG = p.gemsWon + p.gemsLost;
+                const gemPct = totalG > 0 ? ((p.gemsWon / totalG) * 100).toFixed(1) + "%" : "—";
 
                 let rankClass = "";
                 if (rank === 1) rankClass = "rank-1";
@@ -3434,6 +3441,7 @@
                     <td class="text-right" style="color:var(--win); font-weight:700;">${p.wins}</td>
                     <td class="text-right" style="color:var(--loss);">${p.losses}</td>
                     <td class="text-right" style="color:var(--draw);">${p.draws}</td>
+                    <td class="text-right" style="color:var(--text-muted);">${gemPct}</td>
                     <td class="text-right" style="font-weight:700;">${winPct}%</td>
                     <td class="text-center">${formHtml}</td>
                 `;
@@ -4348,7 +4356,7 @@
                 exportedAtIso: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json;charset=utf-8" });
-            const filename = customFilename || `ELO2MASTER_v1.36_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            const filename = customFilename || `ELO2MASTER_v1.37_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             triggerBlobDownload(blob, filename);
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -4397,7 +4405,7 @@
                 csv += `${i+1};${p.name};${p.elo.toFixed(1).replace('.', ',')};${p.matches};${p.wins};${p.losses};${p.draws};${winPct.replace('.', ',')}\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const filename = `ELO2MASTER_v1.36_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            const filename = `ELO2MASTER_v1.37_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             triggerBlobDownload(blob, filename);
         }
 
@@ -4709,7 +4717,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.36 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
+            ctx.fillText("ELO2MASTER V1.37 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
             ctx.font = "700 22px sans-serif";
@@ -4873,7 +4881,7 @@
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const filename = `ELO2MASTER_V1.36_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.37_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
 
             try {
                 // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
