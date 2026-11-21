@@ -1931,7 +1931,7 @@
                 <div class="brand-ball">E2M</div>
                 <div>
                     <div class="brand-title">ELO<span>2</span>MASTER</div>
-                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.50</span>
+                    <span class="brand-sub" id="brand-mode-sub">ELO rebríček, verzia 1.51</span>
                 </div>
             </div>
             <div class="header-badges">
@@ -1960,7 +1960,7 @@
             <div class="stat-tile" id="last-match-banner" style="margin-bottom: 14px; padding: 12px 14px;">
                 <div class="stat-tile-label" id="last-match-label">Posledný odohratý zápas</div>
                 <div id="last-match-board" class="lm-board-wrap"></div>
-                <div class="stat-tile-sub" id="last-match-meta" style="margin-top: 8px;">—</div>
+                <div class="stat-tile-sub" id="last-match-meta" style="margin-top: 8px; color: var(--text-muted); font-weight: 600;">—</div>
             </div>
 
             <div class="card">
@@ -2166,7 +2166,7 @@
                 <div class="card-header">
                     <div class="card-title">
                         <span class="card-title-dot" style="background: var(--tennis-lime);"></span>
-                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.50)
+                        Aktívny režim histórie &amp; GitHub Sync (Verzia 1.51)
                     </div>
                     <span class="param-pill" id="sync-status-pill" style="background:rgba(163,230,53,0.15); color:var(--tennis-lime); border-color:rgba(163,230,53,0.35);">Od 1500 ELO</span>
                 </div>
@@ -2289,7 +2289,7 @@
                                 <span><svg class="inline-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 4v6c0 5-3.5 9.2-7 10-3.5-.8-7-5-7-10V6l7-4z"/></svg> Archívna lokálna záloha</span>
                                 <span class="ctx-popover-badge">JSON</span>
                             </div>
-                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.50_zaloha_RRRR-MM-DD.json</em>).</div>
+                            <div class="ctx-popover-desc">Uloží kompletnú kópiu databázy do PC s aktuálnym dátumom v názve súboru (napr. <em>ELO2MASTER_v1.51_zaloha_RRRR-MM-DD.json</em>).</div>
                             <div class="ctx-popover-tip">Ideálne na priebežné zálohovanie sezóny pred väčšími úpravami.</div>
                         </div>
                     </div>
@@ -3938,7 +3938,7 @@
                 const botSign = formatDelta(botDelta);
                 const topCol = getDeltaCol(topDelta);
                 const botCol = getDeltaCol(botDelta);
-                lmMeta.innerHTML = `Posun ELO: <span style="color:#ffffff;">${safeTop}</span> (<span style="color:${topCol};">${topSign}</span>) · <span style="color:var(--text-muted);">${safeBot}</span> (<span style="color:${botCol};">${botSign}</span>)`;
+                lmMeta.innerHTML = `Posun ELO: <strong style="color:#ffffff;">${safeTop}</strong> (<span style="color:${topCol}; font-weight:800;">${topSign}</span>) · <strong style="color:#ffffff;">${safeBot}</strong> (<span style="color:${botCol}; font-weight:800;">${botSign}</span>)`;
             } else {
                 lmLabel.textContent = "Posledný odohratý zápas";
                 lmBoard.classList.remove("many-sets");
@@ -4812,7 +4812,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 31px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.50 | VÝVOJ ELO V ČASE", innerX + 32, topY + 47);
+            ctx.fillText("ELO2MASTER V1.51 | VÝVOJ ELO V ČASE", innerX + 32, topY + 47);
 
             const todayStr = new Date().toLocaleDateString("sk-SK");
             const rangeUpper = formatChartRangeText(bounds).toUpperCase();
@@ -5025,7 +5025,7 @@
 
         function downloadTvChartGraphic() {
             const canvas = document.getElementById("tvChartCanvas");
-            const filename = `ELO2MASTER_V1.50_TV_Graf_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.51_TV_Graf_${new Date().toISOString().split("T")[0]}.png`;
             try {
                 canvas.toBlob(blob => {
                     if (blob) {
@@ -5556,7 +5556,7 @@
                 exportedAtIso: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json;charset=utf-8" });
-            const filename = customFilename || `ELO2MASTER_v1.50_zaloha_${new Date().toISOString().split("T")[0]}.json`;
+            const filename = customFilename || `ELO2MASTER_v1.51_zaloha_${new Date().toISOString().split("T")[0]}.json`;
             triggerBlobDownload(blob, filename);
             if (customFilename === "databaza.json") {
                 showToast("Súbor databaza.json stiahnutý! Nahraj ho na GitHub vedľa index.html.");
@@ -5605,7 +5605,7 @@
                 csv += `${i+1};${p.name};${p.elo.toFixed(1).replace('.', ',')};${p.matches};${p.wins};${p.losses};${p.draws};${winPct.replace('.', ',')}\n`;
             });
             const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const filename = `ELO2MASTER_v1.50_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
+            const filename = `ELO2MASTER_v1.51_tabulka_${new Date().toISOString().split("T")[0]}.csv`;
             triggerBlobDownload(blob, filename);
         }
 
@@ -5930,7 +5930,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.font = "800 32px sans-serif";
             ctx.textAlign = "left";
-            ctx.fillText("ELO2MASTER V1.50 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
+            ctx.fillText("ELO2MASTER V1.51 | PRIEBEŽNÁ TABUĽKA ELO", innerX + 32, topY + 48);
 
             ctx.fillStyle = "rgba(255, 255, 255, 0.86)";
             ctx.font = "700 22px sans-serif";
@@ -6126,7 +6126,7 @@
 
         function downloadTvGraphic() {
             const canvas = document.getElementById("tvCanvas");
-            const filename = `ELO2MASTER_V1.50_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
+            const filename = `ELO2MASTER_V1.51_TV_Grafika_${new Date().toISOString().split("T")[0]}.png`;
 
             try {
                 // Použitie toBlob + createObjectURL obchádza 2 MB limit prehliadača Chrome na data: URL pri FullHD PNG
@@ -6183,7 +6183,7 @@
         }
 
 
-        /* ==================== NEWS BAR TICKER (v1.50) ==================== */
+        /* ==================== NEWS BAR TICKER (v1.51) ==================== */
         let cachedNewsItems = [];
         let newsLastSignature = "";
         let newsResizeTimer = null;
@@ -6285,7 +6285,7 @@
             const badges = computedBadges || [];
 
             if (players.length === 0) {
-                add("INFO", "Vitajte v ELO2MASTER v1.50! Pridajte prvých hráčov a zápasy pre spustenie štatistík.");
+                add("INFO", "Vitajte v ELO2MASTER v1.51! Pridajte prvých hráčov a zápasy pre spustenie štatistík.");
                 return items;
             }
 
