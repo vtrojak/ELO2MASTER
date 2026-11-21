@@ -2,7 +2,12 @@
   "config": {
     "K": 32,
     "D": 200,
-    "calcFrom1500": true
+    "calcFrom1500": true,
+    "location": {
+      "name": "Čadca",
+      "lat": 49.4386,
+      "lon": 18.7897
+    }
   },
   "players": [
     {
@@ -541,6 +546,7 @@
     "belo": true,
     "majo": true
   },
-  "updatedAt": 1794988261414,
-  "exportedAtIso": "2026-11-18T07:51:01.414Z"
+  "tvMode": "table",
+  "updatedAt": 1795286510963,
+  "exportedAtIso": "2026-11-21T18:41:58.416Z"
 }
