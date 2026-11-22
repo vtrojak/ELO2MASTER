@@ -5505,7 +5505,7 @@
                         <span><strong style="color:${p1.color}">${safeP1} ${(prob1*100).toFixed(1)}%</strong> : <strong style="color:${p2.color}">${safeP2} ${(prob2*100).toFixed(1)}%</strong></span>
                     </div>
                     <div style="font-size:0.78rem; color:var(--text-main); margin-top:8px; padding-top:8px; border-top:1px solid rgba(148,163,184,0.08); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--text-muted);">3) Zmena ELO pri výhre:</span>
+                        <span style="color:var(--text-muted);">3) Zmena ELO:</span>
                         <span>Ak vyhrá ${safeP1}: <strong style="color:var(--win)">+${winGain1}</strong> | Ak vyhrá ${safeP2}: <strong style="color:var(--win)">+${winGain2}</strong></span>
                     </div>
                 </div>
@@ -5720,9 +5720,9 @@
                     </div>
                 </div>
                 <div class="stat-tile" style="text-align:left; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                    <span>Celková bilancia: <strong>${p.matches} záp. (${p.wins}V - ${p.losses}P - ${p.draws}R)</strong></span>
+                    <span>Bilancia: <strong>${p.matches} záp. (${p.wins}V - ${p.losses}P - ${p.draws}R)</strong></span>
                     <span>Úspešnosť: <strong style="color:var(--clay-light)">${winPct}%</strong></span>
-                    <span>Zaznamenané sety: <strong>${p.setsWon}:${p.setsLost}</strong> · Gemy: <strong>${p.gemsWon}:${p.gemsLost}</strong></span>
+                    <span>Sety: <strong>${p.setsWon}:${p.setsLost}</strong> · Gemy: <strong>${p.gemsWon}:${p.gemsLost}</strong></span>
                 </div>
                 ${rivalsHtml}
                 ${ownedBadgesHtml}
